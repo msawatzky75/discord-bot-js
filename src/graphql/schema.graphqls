@@ -1,0 +1,4 @@
+type Subscription {
+	userId: String, # Discord.Snowflake
+	date: Int
+}

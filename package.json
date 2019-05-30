@@ -1,0 +1,25 @@
+{
+  "name": "discord-bot-js",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:msawatzky75/discord-bot-js.git",
+  "author": "Matthew Sawatzky <34319870+msawatzky75@users.noreply.github.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon src/index.ts",
+    "build": ""
+  },
+  "dependencies": {
+    "discord.js": "^11.5.0",
+    "dotenv": "^8.0.0",
+    "graphql": "^14.3.1",
+    "mongodb": "^3.2.6",
+    "mongoose": "^5.5.11",
+    "ts-node": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.0.3",
+    "nodemon": "^1.19.1",
+    "typescript": "^3.5.1"
+  }
+}
