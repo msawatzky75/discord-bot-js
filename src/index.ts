@@ -1,8 +1,11 @@
+import debug from 'debug';
 import {Client} from 'discord.js';
 import {connect} from 'mongoose';
 import {TOKEN, PREFIX, MONGOURL, MONGODB} from './enviroment';
 import Remind from './commands/remind';
 import SetNickname from './commands/setNickname';
+
+const d = debug('bot.src.index');
 
 const setNick = new SetNickname();
 const remind = new Remind();
@@ -20,8 +23,9 @@ client.on('ready', () => {
 client.on('message', msg => {
 	if (msg.content.startsWith(PREFIX)) {
 		const args = msg.content.split(' ');
+		const command = args.shift().substring(1);
 
-		switch(msg.content.split(' ')[0].substring(1)) {
+		switch(command) {
 			case 'setnick':
 				setNick.execute(msg, args);
 				break;

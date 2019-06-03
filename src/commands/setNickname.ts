@@ -1,4 +1,3 @@
-import {Command} from '../types';
 import {
 	GuildMember,
 	Message,
@@ -6,7 +5,7 @@ import {
 	User,
 } from 'discord.js';
 
-export default class SetNickname implements Command {
+export default class SetNickname {
 	execute(msg: Message, args: string[]) {
 		let user = msg.author;
 		const name = args.filter(s => {

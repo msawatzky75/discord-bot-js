@@ -6,16 +6,18 @@
   "author": "Matthew Sawatzky <34319870+msawatzky75@users.noreply.github.com>",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon src/index.ts",
+    "start": "DEBUG=bot.* nodemon src/index.ts",
     "build": ""
   },
   "dependencies": {
+    "debug": "^4.1.1",
     "discord.js": "^11.5.0",
     "dotenv": "^8.0.0",
     "graphql": "^14.3.1",
     "mongodb": "^3.2.6",
     "mongoose": "^5.5.11",
-    "ts-node": "^8.2.0"
+    "ts-node": "^8.2.0",
+    "words-to-numbers": "^1.5.1"
   },
   "devDependencies": {
     "@types/node": "^12.0.3",
