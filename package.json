@@ -10,12 +10,17 @@
     "build": ""
   },
   "dependencies": {
+    "@types/debug": "^4.1.4",
+    "@types/dotenv": "^6.1.1",
+    "@types/lodash": "^4.14.133",
+    "@types/moment": "^2.13.0",
     "debug": "^4.1.1",
     "discord.js": "^11.5.0",
     "dotenv": "^8.0.0",
     "graphql": "^14.3.1",
-    "mongodb": "^3.2.6",
-    "mongoose": "^5.5.11",
+    "lodash": "^4.17.11",
+    "moment": "^2.24.0",
+    "pg": "^7.11.0",
     "ts-node": "^8.2.0",
     "words-to-numbers": "^1.5.1"
   },

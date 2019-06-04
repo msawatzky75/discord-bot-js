@@ -1,19 +1,18 @@
 import {
-	GuildMember,
 	Message,
 	MessageMentions,
-	User,
 } from 'discord.js';
+import {Executable} from '../typings';
 
-export default class SetNickname {
-	execute(msg: Message, args: string[]) {
+export default class SetNickname extends Executable {
+	static execute(msg: Message, args: string[]) {
 		let user = msg.author;
 		const name = args.filter(s => {
 			if (s[0] === '!') {
 				return false;
 			}
 			if (s.match(MessageMentions.USERS_PATTERN)) {
-				user = msg.mentions.users[0];
+				// user = msg.mentions.users[0];
 				return false;
 			}
 		});

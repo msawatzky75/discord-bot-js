@@ -1,4 +1,0 @@
-type Subscription {
-	userId: String, # Discord.Snowflake
-	remindDate: Int
-}
