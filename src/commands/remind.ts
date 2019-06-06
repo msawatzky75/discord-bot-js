@@ -7,6 +7,7 @@ import {
 import moment, {Moment} from 'moment';
 import wordsToNumbers from 'words-to-numbers';
 import findKey from 'lodash/findKey';
+import {pgclient} from '../index';
 import {Subscribable} from '../typings';
 
 const d = debug('bot.src.commands.remind');
@@ -23,15 +24,13 @@ export default class Remind extends Subscribable {
 			throw new Error("Invalid quantity or magnitude");
 		}
 
-		d(quantity, magnitude);
-		d(moment().add(quantity, magnitude));
 		return moment().add(quantity, magnitude);
 	}
 
 	private static parseMagnitude(input: string): Magnitude {
 		return findKey({
-			[Magnitude.minute]: /minute(s)?/,
-			[Magnitude.hour]: /hour(s)?/,
+			[Magnitude.minute]: /min(ute(s)?)?/,
+			[Magnitude.hour]: /hour(s)?|hr(s)?/,
 			[Magnitude.day]: /day(s)?/,
 			[Magnitude.week]: /week(s)?/,
 			[Magnitude.month]: /month(s)?/,
@@ -45,7 +44,17 @@ export default class Remind extends Subscribable {
 			return;
 
 		const remindDate = Remind.parseTime(args.shift(), args.shift());
-		user.send(`${remindDate.calendar()} you will be reminded of ${args.join(' ') || 'nothing'}`)
+
+		pgclient.query({
+			text: 'insert into reminders(snowflake, date, reminder) values($1, $2, $3)',
+			values: [user.id, remindDate.format(), args.join(' ')]
+		}).then(() => {
+			user.send(`${remindDate.calendar()} you will be reminded of ${args.join(' ') || 'nothing'}`)
+		}).catch((err) => {
+			user.send("There was an error saving the reminder.");
+			d(err);
+		});
+
 		// d(`${user.tag} subscribed to ${args.join(' ')}`);
 	}
 

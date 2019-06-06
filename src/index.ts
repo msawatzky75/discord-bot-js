@@ -1,20 +1,32 @@
 import debug from 'debug';
 import {Client} from 'discord.js';
 import * as dotenv from "dotenv";
-import {Client as PgClient} from 'pg';
+import {Client as PGClient} from 'pg';
 import Remind from './commands/remind';
 // import SetNickname from './commands/setNickname';
 
 dotenv.config({ path: `${__dirname}/../.env` });
 const d = debug('bot.src.index');
 const client = new Client();
-const pgclient = new PgClient({
+const pgclient = new PGClient({
 	connectionString: `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
 });
 
+function loadReminders() {
+	pgclient.query({
+		text: "select snowflake, date, reminder from reminders where age(date) < interval '2 hours'"
+	}).then((res: any) => {
+		d(res.rows[0])
+	}).catch(d)
+}
+
 Promise.all([client.login(process.env.TOKEN), pgclient.connect()]).then((values) => {
 	d('Connected to discord and postgres');
-	d(values);
+	pgclient.query({
+		text: 'create table if not exists reminders (snowflake text not null, date timestamp with time zone not null, reminder text, primary key (snowflake, date))'
+	}).then(() => {
+		loadReminders();
+	})
 }).catch((errors) => {
 	d("error:", errors);
 });
@@ -44,3 +56,5 @@ client.on('message', msg => {
 		}
 	}
 });
+
+export {pgclient};
