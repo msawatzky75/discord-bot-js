@@ -57,4 +57,4 @@ client.on('message', msg => {
 	}
 });
 
-export {pgclient};
+export {client, pgclient};

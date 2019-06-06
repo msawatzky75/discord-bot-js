@@ -7,13 +7,21 @@ import {
 import moment, {Moment} from 'moment';
 import wordsToNumbers from 'words-to-numbers';
 import findKey from 'lodash/findKey';
-import {pgclient} from '../index';
+import findIndex from 'lodash/findIndex';
+import {client, pgclient} from '../index';
 import {Subscribable} from '../typings';
 
 const d = debug('bot.src.commands.remind');
 enum Magnitude { minute = "minutes", hour = "hours", day = "days", week = "weeks", month = "months", year = "years" }
+export interface Reminder {
+	snowflake: Snowflake,
+	date: Moment,
+	message: string
+}
 
 export default class Remind extends Subscribable {
+	private static reminders: Collection<string, {reminder: Reminder, timer: NodeJS.Timer}>;
+
 	private static parseTime(quantityInput: string, magnitudeInput: string): Moment {
 		// Parse values
 		const quantity: number = Number(wordsToNumbers(quantityInput, {fuzzy: true}) || quantityInput);
@@ -38,6 +46,22 @@ export default class Remind extends Subscribable {
 		}, val => val.test(input)) as unknown as Magnitude;
 	}
 
+	public static addReminder(reminder: Reminder): void {
+		this.reminders.set(reminder.snowflake + reminder.date.valueOf(), {
+			reminder: reminder,
+			timer: setTimeout(() => {
+				client.fetchUser(reminder.snowflake, true).then((user) => {
+					user.send(`Reminder of '${reminder.message}'`);
+					Remind.removeReminder(reminder);
+				});
+			}, reminder.date.valueOf())
+		});
+	}
+
+	public static removeReminder(reminder: Reminder): void {
+		this.reminders.delete(reminder.snowflake + reminder.date.valueOf());
+	}
+
 	static subscribe(user: User, args: string[]): void {
 		// We need at least 2 arguments.
 		if (args.length < 2)
@@ -47,7 +71,7 @@ export default class Remind extends Subscribable {
 
 		pgclient.query({
 			text: 'insert into reminders(snowflake, date, reminder) values($1, $2, $3)',
-			values: [user.id, remindDate.format(), args.join(' ')]
+			values: [user.id, remindDate.format(), args.join(' ') || undefined]
 		}).then(() => {
 			user.send(`${remindDate.calendar()} you will be reminded of ${args.join(' ') || 'nothing'}`)
 		}).catch((err) => {
