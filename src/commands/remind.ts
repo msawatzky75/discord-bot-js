@@ -20,7 +20,7 @@ export interface Reminder {
 }
 
 export default class Remind extends Subscribable {
-	private static reminders: Collection<string, {reminder: Reminder, timer: NodeJS.Timer}>;
+	private static reminders: Collection<string, {reminder: Reminder, timer: NodeJS.Timer}> = new Collection<string, {reminder: Reminder, timer: NodeJS.Timer}>();
 
 	private static parseTime(quantityInput: string, magnitudeInput: string): Moment {
 		// Parse values
@@ -30,6 +30,7 @@ export default class Remind extends Subscribable {
 		// Validate values
 		if (!magnitude || isNaN(quantity)) {
 			throw new Error("Invalid quantity or magnitude");
+			d(quantity, magnitude);
 		}
 
 		return moment().add(quantity, magnitude);
@@ -43,7 +44,7 @@ export default class Remind extends Subscribable {
 			[Magnitude.week]: /week(s)?/,
 			[Magnitude.month]: /month(s)?/,
 			[Magnitude.year]: /year(s)?/,
-		}, val => val.test(input)) as unknown as Magnitude;
+		}, val => val.test(input)) as Magnitude;
 	}
 
 	public static addReminder(reminder: Reminder): void {
@@ -54,8 +55,9 @@ export default class Remind extends Subscribable {
 					user.send(`Reminder of '${reminder.message}'`);
 					Remind.removeReminder(reminder);
 				});
-			}, reminder.date.valueOf())
+			}, reminder.date.diff(moment()))
 		});
+		d(reminder.date.diff(moment()))
 	}
 
 	public static removeReminder(reminder: Reminder): void {
@@ -69,11 +71,13 @@ export default class Remind extends Subscribable {
 
 		const remindDate = Remind.parseTime(args.shift(), args.shift());
 
+		d(remindDate.format())
 		pgclient.query({
 			text: 'insert into reminders(snowflake, date, reminder) values($1, $2, $3)',
-			values: [user.id, remindDate.format(), args.join(' ') || undefined]
+			values: [user.id, remindDate.toISOString(true), args.join(' ') || undefined]
 		}).then(() => {
 			user.send(`${remindDate.calendar()} you will be reminded of ${args.join(' ') || 'nothing'}`)
+			this.addReminder({snowflake: user.id, date: remindDate, message: args.join(' ')})
 		}).catch((err) => {
 			user.send("There was an error saving the reminder.");
 			d(err);
