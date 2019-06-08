@@ -20,7 +20,7 @@ export interface Reminder {
 }
 
 export default class Remind extends Subscribable {
-	private static reminders: Collection<string, {reminder: Reminder, timer: NodeJS.Timer}> = new Collection<string, {reminder: Reminder, timer: NodeJS.Timer}>();
+	static reminders: Collection<string, {reminder: Reminder, timer: NodeJS.Timer}> = new Collection<string, {reminder: Reminder, timer: NodeJS.Timer}>();
 
 	private static parseTime(quantityInput: string, magnitudeInput: string): Moment {
 		// Parse values
@@ -48,16 +48,18 @@ export default class Remind extends Subscribable {
 	}
 
 	public static addReminder(reminder: Reminder): void {
-		this.reminders.set(reminder.snowflake + reminder.date.valueOf(), {
+		Remind.reminders.set(reminder.snowflake + reminder.date.valueOf(), {
 			reminder: reminder,
+			
 			timer: setTimeout(() => {
 				client.fetchUser(reminder.snowflake, true).then((user) => {
 					user.send(`Reminder of '${reminder.message}'`);
+					d(`Sent reminder to ${user.tag} with message ${reminder.message}`);
 					Remind.removeReminder(reminder);
 				});
-			}, reminder.date.diff(moment()))
+			}, moment(reminder.date).diff(moment.utc()))
 		});
-		d(reminder.date.diff(moment()))
+		d("Added reminder:", moment(reminder.date).local().calendar(), "with message", reminder.message);
 	}
 
 	public static removeReminder(reminder: Reminder): void {
@@ -69,11 +71,10 @@ export default class Remind extends Subscribable {
 		if (args.length < 2)
 			return;
 
-		const remindDate = Remind.parseTime(args.shift(), args.shift());
+		const remindDate = Remind.parseTime(args.shift(), args.shift()).utc();
 
-		d(remindDate.format())
 		pgclient.query({
-			text: 'insert into reminders(snowflake, date, reminder) values($1, $2, $3)',
+			text: 'insert into reminders(snowflake, date, message) values($1, $2, $3)',
 			values: [user.id, remindDate.toISOString(true), args.join(' ') || undefined]
 		}).then(() => {
 			user.send(`${remindDate.calendar()} you will be reminded of ${args.join(' ') || 'nothing'}`)

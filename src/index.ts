@@ -14,9 +14,9 @@ const pgclient = new PGClient({
 
 function loadReminders() {
 	pgclient.query({
-		text: "select snowflake, date, reminder from reminders where age(date) < interval '2 hours'"
+		text: "select snowflake, date, message from reminders where age(date) < interval '2 hours' and date > current_timestamp"
 	}).then((res: any) => {
-		d(res.rows[0])
+		res.rows.forEach(Remind.addReminder);
 	}).catch(d)
 }
 
