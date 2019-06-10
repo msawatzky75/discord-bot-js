@@ -7,8 +7,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "DEBUG=bot.* nodemon src/index.ts",
-	  "build": "tsc ./src",
-    "start": "yarn build && node build/index.js"
+    "start": "tsc && node build/index.js"
   },
   "dependencies": {
     "@types/debug": "^4.1.4",
