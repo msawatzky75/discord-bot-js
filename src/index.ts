@@ -21,7 +21,7 @@ function loadReminders() {
 Promise.all([client.login(process.env.TOKEN), pgclient.connect()]).then((values) => {
 	d('Connected to discord and postgres');
 	pgclient.query({
-		text: 'create table if not exists reminders (snowflake text not null, date timestamp with time zone not null, reminder text, primary key (snowflake, date))'
+		text: 'create table if not exists reminders (snowflake text not null, date timestamp with time zone not null, message text, primary key (snowflake, date))'
 	}).then(() => {
 		loadReminders();
 	})
