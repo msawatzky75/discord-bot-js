@@ -55,4 +55,6 @@ client.on('message', msg => {
 	}
 });
 
+// heroku workaround.
+require('http').listen(process.env.PORT || 80);
 export {client, pgclient};
