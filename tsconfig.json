@@ -4,7 +4,8 @@
 		"target": "esnext",
 		"noImplicitAny": true,
 		"moduleResolution": "node",
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"outDir": "build"
 	},
 	"include": [
 		"src/**/*"
