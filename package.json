@@ -6,8 +6,9 @@
   "author": "Matthew Sawatzky <34319870+msawatzky75@users.noreply.github.com>",
   "license": "MIT",
   "scripts": {
-    "start": "DEBUG=bot.* nodemon src/index.ts",
-    "build": ""
+    "dev": "DEBUG=bot.* nodemon src/index.ts",
+	  "build": "tsc ./src",
+    "start": "yarn build && node build/index.js"
   },
   "dependencies": {
     "@types/debug": "^4.1.4",
