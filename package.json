@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "DEBUG=bot.* nodemon src/index.ts",
-    "start": "tsc && node build/index.js"
+    "start": "DEBUG=bot.* tsc && node build/index.js"
   },
   "dependencies": {
     "@types/debug": "^4.1.4",

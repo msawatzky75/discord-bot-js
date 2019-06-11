@@ -3,6 +3,8 @@ import {Client} from 'discord.js';
 import * as dotenv from "dotenv";
 import {Client as PGClient} from 'pg';
 import Remind from './commands/remind';
+import Sarcasm
+	from './commands/sarcasm';
 // import SetNickname from './commands/setNickname';
 
 dotenv.config({ path: `${__dirname}/../.env` });
@@ -46,6 +48,10 @@ client.on('message', msg => {
 			case 'remindme':
 			case 'remind':
 				Remind.subscribe(msg.author, args);
+				break;
+
+			case 'sarcasm':
+				Sarcasm.execute(msg, args);
 				break;
 
 			default:
