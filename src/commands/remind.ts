@@ -16,7 +16,7 @@ enum Magnitude { minute = "minutes", hour = "hours", day = "days", week = "weeks
 export interface Reminder {
 	snowflake: Snowflake,
 	date: Moment,
-	message: string
+	message: string,
 }
 
 export default class Remind extends Subscribable {
@@ -24,13 +24,13 @@ export default class Remind extends Subscribable {
 
 	private static parseTime(quantityInput: string, magnitudeInput: string): Moment {
 		// Parse values
-		const quantity: number = Number(wordsToNumbers(quantityInput, {fuzzy: true}) || quantityInput);
+		const quantity = Number(wordsToNumbers(quantityInput, {fuzzy: true}) || quantityInput);
 		const magnitude: Magnitude = this.parseMagnitude(magnitudeInput);
 
 		// Validate values
 		if (!magnitude || isNaN(quantity)) {
-			throw new Error("Invalid quantity or magnitude");
 			d(quantity, magnitude);
+			throw new Error("Invalid quantity or magnitude");
 		}
 
 		return moment().add(quantity, magnitude);
@@ -50,14 +50,14 @@ export default class Remind extends Subscribable {
 	public static addReminder(reminder: Reminder): void {
 		Remind.reminders.set(reminder.snowflake + reminder.date.valueOf(), {
 			reminder: reminder,
-			
+
 			timer: setTimeout(() => {
-				client.fetchUser(reminder.snowflake, true).then((user) => {
+				client.fetchUser(reminder.snowflake, true).then(user => {
 					user.send(`Reminder of '${reminder.message}'`);
 					d(`Sent reminder to ${user.tag} with message ${reminder.message}`);
 					Remind.removeReminder(reminder);
 				});
-			}, moment(reminder.date).diff(moment.utc()))
+			}, moment(reminder.date).diff(moment.utc())),
 		});
 		d("Added reminder:", moment(reminder.date).local().calendar(), "with message", reminder.message);
 	}
@@ -75,11 +75,11 @@ export default class Remind extends Subscribable {
 
 		pgclient.query({
 			text: 'insert into reminders(snowflake, date, message) values($1, $2, $3)',
-			values: [user.id, remindDate.toISOString(true), args.join(' ') || undefined]
+			values: [user.id, remindDate.toISOString(true), args.join(' ') || undefined],
 		}).then(() => {
 			user.send(`${remindDate.calendar()} you will be reminded of ${args.join(' ') || 'nothing'}`)
 			this.addReminder({snowflake: user.id, date: remindDate, message: args.join(' ')})
-		}).catch((err) => {
+		}).catch(err => {
 			user.send("There was an error saving the reminder.");
 			d(err);
 		});

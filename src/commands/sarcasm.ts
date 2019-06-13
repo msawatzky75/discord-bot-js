@@ -1,8 +1,5 @@
 import debug from 'debug';
-import {
-	MessageMentions,
-	Message,
-} from 'discord.js';
+import {Message} from 'discord.js';
 import {Executable} from '../typings';
 
 const d = debug('bot.src.commands.sarcasm');

@@ -1,11 +1,8 @@
 import debug from 'debug';
 import {Client} from 'discord.js';
-import * as dotenv from "dotenv";
+import dotenv from "dotenv";
 import {Client as PGClient} from 'pg';
-import Remind from './commands/remind';
-import Sarcasm
-	from './commands/sarcasm';
-// import SetNickname from './commands/setNickname';
+import {Config, Help, Nickname, Remind, Sarcasm, Welcome} from './commands';
 
 dotenv.config({ path: `${__dirname}/../.env` });
 const d = debug('bot.src.index');
@@ -20,7 +17,7 @@ function loadReminders() {
 	}).catch(d)
 }
 
-Promise.all([client.login(process.env.TOKEN), pgclient.connect()]).then((values) => {
+Promise.all([client.login(process.env.TOKEN), pgclient.connect()]).then(() => {
 	d('Connected to discord and postgres');
 	pgclient.query({
 		text: 'create table if not exists reminders (snowflake text not null, date timestamp with time zone not null, message text, primary key (snowflake, date))'
@@ -42,7 +39,7 @@ client.on('message', msg => {
 
 		switch(command) {
 			case 'setnick':
-				// SetNickname.execute(msg, args);
+				Nickname.execute(msg, args);
 				break;
 
 			case 'remindme':
@@ -54,11 +51,23 @@ client.on('message', msg => {
 				Sarcasm.execute(msg, args);
 				break;
 
+			case 'config':
+				Config.execute(msg, args);
+				break;
+
+			case 'help':
+				Help.execute(msg, args);
+				break;
+
 			default:
 				console.log(`${msg.author.tag} tried ${msg.content}`);
 				break;
 		}
 	}
+});
+
+client.on('guildMemberAdd', member => {
+	Welcome.execute(member);
 });
 
 // heroku workaround.
