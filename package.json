@@ -6,6 +6,7 @@
   "author": "Matthew Sawatzky <34319870+msawatzky75@users.noreply.github.com>",
   "license": "MIT",
   "scripts": {
+	  "db": "DEBUG=* ts-node src/initdb.ts",
     "dev": "DEBUG=bot.* nodemon src/index.ts",
     "start": "DEBUG=bot.* tsc && node build/index.js"
   },

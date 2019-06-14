@@ -4,14 +4,14 @@ import dotenv from "dotenv";
 import {Client as PGClient} from 'pg';
 import {Config, Help, Nickname, Remind, Sarcasm, Welcome} from './commands';
 
-dotenv.config({ path: `${__dirname}/../.env` });
+dotenv.config({path: `${__dirname}/../.env`});
 const d = debug('bot.src.index');
 const client = new Client();
 const pgclient = new PGClient({connectionString: process.env.DATABASE_URL});
 
 function loadReminders() {
 	pgclient.query({
-		text: "select snowflake, date, message from reminders where age(date) < interval '2 hours' and date > current_timestamp"
+		text: "select userId, date, message from reminders where age(date) < interval '2 hours' and date > current_timestamp",
 	}).then((res: any) => {
 		res.rows.forEach(Remind.addReminder);
 	}).catch(d)
@@ -19,14 +19,8 @@ function loadReminders() {
 
 Promise.all([client.login(process.env.TOKEN), pgclient.connect()]).then(() => {
 	d('Connected to discord and postgres');
-	pgclient.query({
-		text: 'create table if not exists reminders (snowflake text not null, date timestamp with time zone not null, message text, primary key (snowflake, date))'
-	}).then(() => {
-		loadReminders();
-	})
-}).catch((errors) => {
-	d("error:", errors);
-});
+	loadReminders();
+}).catch(d);
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}`);
@@ -71,5 +65,5 @@ client.on('guildMemberAdd', member => {
 });
 
 // heroku workaround.
-require('http').createServer(() => console.log('some sucker just tried to look at this like a website.')).listen(process.env.PORT || 80);
+// require('http').createServer(() => console.log('some sucker just tried to look at this like a website.')).listen(process.env.PORT || 80);
 export {client, pgclient};

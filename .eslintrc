@@ -27,7 +27,7 @@
 		"max-len": ["error", {"code": 200}],
 		"space-before-function-paren": ["error", {"anonymous": "never", "named": "never", "asyncArrow": "always"}],
 		"no-return-assign": ["error", "except-parens"],
-		"no-console": ["error"],
+		"no-console": "off",
 		"function-paren-newline": ["error", "consistent"],
 		"lines-between-class-members": ["error", "always", {"exceptAfterSingleLine": true}],
 		"max-statements": ["warn", {"max": 100}],

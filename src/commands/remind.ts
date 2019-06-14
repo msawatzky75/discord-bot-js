@@ -7,20 +7,19 @@ import {
 import moment, {Moment} from 'moment';
 import wordsToNumbers from 'words-to-numbers';
 import findKey from 'lodash/findKey';
-import findIndex from 'lodash/findIndex';
 import {client, pgclient} from '../index';
 import {Subscribable} from '../typings';
 
 const d = debug('bot.src.commands.remind');
 enum Magnitude { minute = "minutes", hour = "hours", day = "days", week = "weeks", month = "months", year = "years" }
 export interface Reminder {
-	snowflake: Snowflake,
+	userId: Snowflake,
 	date: Moment,
 	message: string,
 }
 
 export default class Remind extends Subscribable {
-	static reminders: Collection<string, {reminder: Reminder, timer: NodeJS.Timer}> = new Collection<string, {reminder: Reminder, timer: NodeJS.Timer}>();
+	private static reminders: Collection<string, {reminder: Reminder, timer: NodeJS.Timer}> = new Collection<string, {reminder: Reminder, timer: NodeJS.Timer}>();
 
 	private static parseTime(quantityInput: string, magnitudeInput: string): Moment {
 		// Parse values
@@ -48,11 +47,11 @@ export default class Remind extends Subscribable {
 	}
 
 	public static addReminder(reminder: Reminder): void {
-		Remind.reminders.set(reminder.snowflake + reminder.date.valueOf(), {
+		Remind.reminders.set(reminder.userId + reminder.date.valueOf(), {
 			reminder: reminder,
 
 			timer: setTimeout(() => {
-				client.fetchUser(reminder.snowflake, true).then(user => {
+				client.fetchUser(reminder.userId, true).then(user => {
 					user.send(`Reminder of '${reminder.message}'`);
 					d(`Sent reminder to ${user.tag} with message ${reminder.message}`);
 					Remind.removeReminder(reminder);
@@ -63,10 +62,10 @@ export default class Remind extends Subscribable {
 	}
 
 	public static removeReminder(reminder: Reminder): void {
-		this.reminders.delete(reminder.snowflake + reminder.date.valueOf());
+		this.reminders.delete(reminder.userId + reminder.date.valueOf());
 	}
 
-	static subscribe(user: User, args: string[]): void {
+	public static subscribe(user: User, args: string[]): void {
 		// We need at least 2 arguments.
 		if (args.length < 2)
 			return;
@@ -74,11 +73,11 @@ export default class Remind extends Subscribable {
 		const remindDate = Remind.parseTime(args.shift(), args.shift()).utc();
 
 		pgclient.query({
-			text: 'insert into reminders(snowflake, date, message) values($1, $2, $3)',
+			text: 'insert into reminders(userId, date, message) values($1, $2, $3)',
 			values: [user.id, remindDate.toISOString(true), args.join(' ') || undefined],
 		}).then(() => {
-			user.send(`${remindDate.calendar()} you will be reminded of ${args.join(' ') || 'nothing'}`)
-			this.addReminder({snowflake: user.id, date: remindDate, message: args.join(' ')})
+			user.send(`${remindDate.calendar()} you will be reminded of ${args.join(' ') || 'nothing'}`);
+			this.addReminder({userId: user.id, date: remindDate, message: args.join(' ')})
 		}).catch(err => {
 			user.send("There was an error saving the reminder.");
 			d(err);
@@ -87,8 +86,7 @@ export default class Remind extends Subscribable {
 		// d(`${user.tag} subscribed to ${args.join(' ')}`);
 	}
 
-	static unSubscribe(user: User): void {
-
+	public static unSubscribe(user: User): void {
 		d(`${user.tag} unsubscribed.`);
 	}
 }
