@@ -12,7 +12,7 @@ const pgclient = new PGClient({connectionString: process.env.DATABASE_URL});
 function loadReminders() {
 	pgclient.query({
 		text: "select userId, date, message from reminders where age(date) < interval '2 hours' and date > current_timestamp",
-	}).then((res: any) => {
+	}).then(res => {
 		res.rows.forEach(Remind.addReminder);
 	}).catch(d)
 }
