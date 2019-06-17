@@ -38,8 +38,15 @@ function parseConfigProperty(str: string): ConfigProperty {
 }
 
 function parseTimeZone(str: string): string | null {
-	if (includes(moment.tz.names(), str.trim())){
-		return str;
+	const timezones = moment.tz.names().map(s => s.toLowerCase());
+	const simpleTimezones = timezones.map(s => s.split('/')[1]);
+	const input = str.toLowerCase();
+
+	if (includes(timezones, input)){
+		return moment.tz.names()[timezones.indexOf(input)];
+	}
+	else if (includes(simpleTimezones, input)) {
+		return moment.tz.names()[simpleTimezones.indexOf(input)];
 	}
 	return null;
 }
@@ -50,22 +57,27 @@ export default function Config(msg: Message, args: string[]) {
 		property: parseConfigProperty(args.shift()),
 		value: args.join(' '),
 	};
+	d('config options:', config);
+
 	switch (config.property) {
 		case ConfigProperty.welcome:
 			break;
 
 		case ConfigProperty.timezone:
+			d('setting timezone');
 			// if there is a value for timezone, try and parse it before continuing.
 			if (config.value) {
 				config.value = parseTimeZone(config.value);
+				d('parsed timezone to be', config.value);
 			}
 			if (config.value) {
 				pgclient.query({
 					text: "select timezone from timezones where userId = $1",
 					values: [msg.author.id],
-				}).then(results => {
-					msg.author.send(`Changing timezone from '${results.rows[0].timezone}' to '${config.value}'`);
-					pgclient.query(results.rowCount ? 'update timezones set timezone = $2 where userId = $1' : 'insert into timezones(userId, timezone) values($1, $2)',
+				}).then(({rows, rowCount}) => {
+					const prevTimezone = rows[0] ? rows[0].timezone : 'unset';
+					msg.author.send(`Changing timezone from '${prevTimezone}' to '${config.value}'`);
+					pgclient.query(rowCount ? 'update timezones set timezone = $2 where userId = $1' : 'insert into timezones(userId, timezone) values($1, $2)',
 						[msg.author.id, config.value]).catch(d);
 				});
 			}

@@ -12,7 +12,6 @@ import {client, pgclient} from '../index';
 const d = debug('bot.src.commands.remind');
 const reminders: Collection<number, NodeJS.Timer> = new Collection<number, NodeJS.Timer>();
 
-
 enum Magnitude { minute = "minutes", hour = "hours", day = "days", week = "weeks", month = "months", year = "years" }
 export interface Reminder {
 	userId: Snowflake,
@@ -22,10 +21,10 @@ export interface Reminder {
 
 export class Reminder {
 	private static lastId: number = -1;
-	id: number
-	userId: Snowflake
-	date: Moment
-	message: string
+	id: number;
+	userId: Snowflake;
+	date: Moment;
+	message: string;
 
 	static getNextId() { return this.lastId++; }
 
@@ -60,7 +59,7 @@ export class Reminder {
 		}
 		if (quantity > 1000) {
 			d(quantity);
-			throw new Error("Quantity is too large. Try less than 1000.")
+			throw new Error("Quantity is too large. Try less than 1000.");
 		}
 
 		return moment().add(quantity, magnitude);
@@ -75,7 +74,7 @@ export class Reminder {
 		}
 	}
 
-	static parseMagnitude(input: string): Magnitude {
+	static parseMagnitude(input: string): Magnitude | null {
 		return findKey({
 			[Magnitude.minute]: /min(ute(s)?)?/,
 			[Magnitude.hour]: /hour(s)?|hr(s)?/,
@@ -83,7 +82,7 @@ export class Reminder {
 			[Magnitude.week]: /week(s)?/,
 			[Magnitude.month]: /month(s)?/,
 			[Magnitude.year]: /year(s)?/,
-		}, val => val.test(input)) as Magnitude;
+		}, val => val.test(input)) as Magnitude || null;
 	}
 
 	constructor(userId?: Snowflake, args?: string[]) {
@@ -100,14 +99,12 @@ export class Reminder {
 
 export function LoadReminders() {
 	pgclient.query({
-		text: "select userId, date, message from reminders where age(date) < interval '2 hours' and date > current_timestamp",
+		text: "select userId, date, message from reminders where date > current_timestamp",
 	}).then(({rows}) => rows.forEach(Reminder.load)).catch(d)
 }
 
 export default function Remind(user: User, args: string[]): void {
 	const reminder = new Reminder(user.id, args);
-
-	// TODO: utilize user timezone, if not set, ask them to set one.
 
 	if (reminder.valid()) {
 		pgclient.query({
@@ -115,7 +112,7 @@ export default function Remind(user: User, args: string[]): void {
 			values: [reminder.userId, reminder.date.toISOString(true), reminder.message],
 		}).then(() => {
 			pgclient.query("select timezone from timezones where userId = $1", [user.id]).then(({rows}) => {
-				const timezone: string = rows[0].timezone || 'utc';
+				const timezone: string = rows[0] ? rows[0].timezone : 'utc';
 				if (timezone === 'utc') {
 					user.send('You have not configured your timezone yet, to do so use the config command like this: `' + process.env.PREFIX + 'config set timezone est.' +
 					' This message will be sent for every reminder you request until it is set. For now, all times will be shown in UTC.');

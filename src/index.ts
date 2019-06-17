@@ -24,32 +24,39 @@ client.on('message', msg => {
 	if (msg.content.startsWith(process.env.PREFIX)) {
 		const args: string[] = msg.content.split(' ');
 		const command: string = args.shift().substring(1);
+		d('received command', command, args);
 
-		switch(command) {
-			case 'setnick':
-				Nickname(msg, args);
-				break;
+		try {
+			switch(command) {
+				case 'setnick':
+					Nickname(msg, args);
+					break;
 
-			case 'remindme':
-			case 'remind':
-				Remind(msg.author, args);
-				break;
+				case 'remindme':
+				case 'remind':
+					Remind(msg.author, args);
+					break;
 
-			case 'sarcasm':
-				Sarcasm(msg, args);
-				break;
+				case 'sarcasm':
+					Sarcasm(msg, args);
+					break;
 
-			case 'config':
-				Config(msg, args);
-				break;
+				case 'config':
+					Config(msg, args);
+					break;
 
-			case 'help':
-				Help(msg, args);
-				break;
+				case 'help':
+					Help(msg, args);
+					break;
 
-			default:
-				console.log(`${msg.author.tag} tried ${msg.content}`);
-				break;
+				default:
+					console.log(`${msg.author.tag} tried ${msg.content}`);
+					break;
+			}
+		}
+		catch (e) {
+			d(e);
+			msg.author.send(e.message);
 		}
 	}
 });
