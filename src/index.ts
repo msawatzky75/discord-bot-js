@@ -2,25 +2,19 @@ import debug from 'debug';
 import {Client} from 'discord.js';
 import dotenv from "dotenv";
 import {Client as PGClient} from 'pg';
-import {Config, Help, Nickname, Remind, Sarcasm, Welcome} from './commands';
+import {Config, Help, Nickname, Remind, Sarcasm} from './commands';
 
 dotenv.config({path: `${__dirname}/../.env`});
 const d = debug('bot.src.index');
 const client = new Client();
 const pgclient = new PGClient({connectionString: process.env.DATABASE_URL});
 
-function loadReminders() {
-	pgclient.query({
-		text: "select userId, date, message from reminders where age(date) < interval '2 hours' and date > current_timestamp",
-	}).then(res => {
-		res.rows.forEach(Remind.addReminder);
-	}).catch(d)
+// This is needed or the bot attempts to start while running tests.
+if (!process.env.TEST) {
+	Promise.all([client.login(process.env.TOKEN), pgclient.connect()]).then(() => {
+		d('Connected to discord and postgres');
+	}).catch(d);
 }
-
-Promise.all([client.login(process.env.TOKEN), pgclient.connect()]).then(() => {
-	d('Connected to discord and postgres');
-	loadReminders();
-}).catch(d);
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}`);
@@ -33,24 +27,24 @@ client.on('message', msg => {
 
 		switch(command) {
 			case 'setnick':
-				Nickname.execute(msg, args);
+				Nickname(msg, args);
 				break;
 
 			case 'remindme':
 			case 'remind':
-				Remind.subscribe(msg.author, args);
+				Remind(msg.author, args);
 				break;
 
 			case 'sarcasm':
-				Sarcasm.execute(msg, args);
+				Sarcasm(msg, args);
 				break;
 
 			case 'config':
-				Config.execute(msg, args);
+				Config(msg, args);
 				break;
 
 			case 'help':
-				Help.execute(msg, args);
+				Help(msg, args);
 				break;
 
 			default:
@@ -61,9 +55,7 @@ client.on('message', msg => {
 });
 
 client.on('guildMemberAdd', member => {
-	Welcome.execute(member);
+	// Welcome(member);
 });
 
-// heroku workaround.
-// require('http').createServer(() => console.log('some sucker just tried to look at this like a website.')).listen(process.env.PORT || 80);
 export {client, pgclient};

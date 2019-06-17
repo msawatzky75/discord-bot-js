@@ -1,8 +1,5 @@
-import {Executable} from '../typings';
 import {Message} from 'discord.js';
 
-export default class Help extends Executable {
-	static execute(msg: Message, args: string[]) {
-
-	}
+export default function Help(msg: Message, args: string[]) {
+	throw new Error('Not yet implemented');
 }

@@ -1,8 +1,9 @@
 import {Message} from 'discord.js';
 import debug from 'debug';
 import findKey from 'lodash/findKey';
+import includes from 'lodash/includes'
 import {pgclient} from '../index';
-import {Executable} from '../typings';
+import moment from 'moment-timezone';
 
 const d = debug('bot.src.commands.config');
 
@@ -21,53 +22,57 @@ interface ConfigOptions {
 	value: string,
 }
 
-export default class Config extends Executable {
-	static parseConfigType(str: string): ConfigType {
-		return findKey({
-			[ConfigType.set]: /set/i,
-			[ConfigType.update]: /update/i,
-			[ConfigType.remove]: /remove|delete/i,
-		}, val => val.test(str)) as ConfigType;
-	}
+function parseConfigType(str: string): ConfigType {
+	return findKey({
+		[ConfigType.set]: /set/i,
+		[ConfigType.update]: /update/i,
+		[ConfigType.remove]: /remove|delete/i,
+	}, val => val.test(str)) as ConfigType;
+}
 
-	static parseConfigProperty(str: string): ConfigProperty {
-		return findKey({
-			[ConfigProperty.timezone]: /timezone/i,
-			[ConfigProperty.welcome]: /welcome|greeting|welcomechannel/i,
-		}, val => val.test(str)) as ConfigProperty;
-	}
+function parseConfigProperty(str: string): ConfigProperty {
+	return findKey({
+		[ConfigProperty.timezone]: /timezone/i,
+		[ConfigProperty.welcome]: /welcome|greeting|welcomechannel/i,
+	}, val => val.test(str)) as ConfigProperty;
+}
 
-	static parseTimeZone(str: string): string | null {
+function parseTimeZone(str: string): string | null {
+	if (includes(moment.tz.names(), str.trim())){
 		return str;
 	}
+	return null;
+}
 
-	static execute(msg: Message, args: string[]) {
-		const config: ConfigOptions = {
-			type: Config.parseConfigType(args.shift()),
-			property: Config.parseConfigProperty(args.shift()),
-			value: args.join(' '),
-		};
-		switch (config.property) {
-			case ConfigProperty.timezone:
-				break;
+export default function Config(msg: Message, args: string[]) {
+	const config: ConfigOptions = {
+		type: parseConfigType(args.shift()),
+		property: parseConfigProperty(args.shift()),
+		value: args.join(' '),
+	};
+	switch (config.property) {
+		case ConfigProperty.welcome:
+			break;
 
-			case ConfigProperty.welcome:
-				const zone = Config.parseTimeZone(args.join(' '));
-				if (zone) {
-					pgclient.query({
-						text: "select 1 from timezones where userId = $1",
-						values: [msg.author.id],
-					}).then(results => {
-						const queryConfig = {
-							text: results.rowCount ? 'update timezones set timezone = $2 where userId = $1' : 'insert into timezones(userId, timezone) values($1, $2)',
-							values: [msg.author.id, zone],
-						};
+		case ConfigProperty.timezone:
+			// if there is a value for timezone, try and parse it before continuing.
+			if (config.value) {
+				config.value = parseTimeZone(config.value);
+			}
+			if (config.value) {
+				pgclient.query({
+					text: "select timezone from timezones where userId = $1",
+					values: [msg.author.id],
+				}).then(results => {
+					msg.author.send(`Changing timezone from '${results.rows[0].timezone}' to '${config.value}'`);
+					pgclient.query(results.rowCount ? 'update timezones set timezone = $2 where userId = $1' : 'insert into timezones(userId, timezone) values($1, $2)',
+						[msg.author.id, config.value]).catch(d);
+				});
+			}
+			break;
 
-						pgclient.query(queryConfig).catch(d);
-					});
-				}
-				break;
-		}
-		d(config);
+		default:
+			msg.author.send(`${config.property} is not a valid property.`);
+			break;
 	}
 }

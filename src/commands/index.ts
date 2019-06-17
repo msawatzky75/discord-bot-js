@@ -3,7 +3,6 @@ import Help from './help';
 import Nickname from './nickname';
 import Remind from './remind';
 import Sarcasm from './sarcasm';
-import Welcome from './welcome';
 
 export {
 	Config,
@@ -11,5 +10,4 @@ export {
 	Nickname,
 	Remind,
 	Sarcasm,
-	Welcome,
 };
