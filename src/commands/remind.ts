@@ -127,10 +127,10 @@ export default function Remind(user: User, args: string[]): void {
 					d(`Sent reminder to ${user.tag} with message ${reminder.message}`);
 					reminders.delete(reminder.id);
 				}, reminder.date.utc().diff(moment.utc())));
-			})
+			});
 		}).catch(err => {
 			user.send("There was an error saving the reminder.");
 			d(err);
 		});
 	}
-};
+}

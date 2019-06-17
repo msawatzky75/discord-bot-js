@@ -6,19 +6,13 @@
   "author": "Matthew Sawatzky <34319870+msawatzky75@users.noreply.github.com>",
   "license": "MIT",
   "scripts": {
-		"build": "tsc",
+    "build": "tsc",
     "db": "DEBUG=* ts-node src/initdb.ts",
     "dev": "DEBUG=bot.* nodemon src/index.ts",
     "start": "DEBUG=bot.* tsc && node build/index.js",
     "test": "TEST=true mocha --require ts-node/register test/**/*.ts"
   },
   "dependencies": {
-    "@types/debug": "^4.1.4",
-    "@types/dotenv": "^6.1.1",
-    "@types/lodash": "^4.14.133",
-    "@types/moment": "^2.13.0",
-    "@types/moment-timezone": "^0.5.12",
-    "@types/pg": "^7.4.14",
     "debug": "^4.1.1",
     "discord.js": "^11.5.0",
     "dotenv": "^8.0.0",
@@ -26,14 +20,18 @@
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.25",
     "pg": "^7.11.0",
-    "python-shell": "^1.0.7",
-    "ts-node": "^8.2.0",
     "words-to-numbers": "^1.5.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
+    "@types/debug": "^4.1.4",
+    "@types/dotenv": "^6.1.1",
+    "@types/lodash": "^4.14.133",
     "@types/mocha": "^5.2.7",
+    "@types/moment": "^2.13.0",
+    "@types/moment-timezone": "^0.5.12",
     "@types/node": "^12.0.3",
+    "@types/pg": "^7.4.14",
     "@typescript-eslint/eslint-plugin": "^1.10.2",
     "@typescript-eslint/parser": "^1.10.2",
     "chai": "^4.2.0",
@@ -41,6 +39,7 @@
     "eslint-plugin-import": "^2.17.3",
     "mocha": "^6.1.4",
     "nodemon": "^1.19.1",
+    "ts-node": "^8.2.0",
     "typescript": "^3.5.1"
   }
 }

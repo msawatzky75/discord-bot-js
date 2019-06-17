@@ -1,7 +1,7 @@
 import {Message, RichEmbed} from 'discord.js';
 import debug from 'debug';
 import findKey from 'lodash/findKey';
-import includes from 'lodash/includes'
+import includes from 'lodash/includes';
 import {pgclient} from '../index';
 import moment from 'moment-timezone';
 
@@ -85,15 +85,15 @@ export function help(): RichEmbed {
 		fields: [
 			{
 				name: 'Usage',
-				value: '!config [action] [property] [value]'
+				value: '!config [action] [property] [value]',
 			},
 			{
 				name: 'Actions',
-				value: 'set, update, remove'
+				value: 'set, update, remove',
 			},
 			{
 				name: 'Properties',
-				value: 'timezone, welcomechannel'
+				value: 'timezone, welcomechannel',
 			},
 		],
 	});
