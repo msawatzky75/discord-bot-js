@@ -1,4 +1,4 @@
-import {Message} from 'discord.js';
+import {Message, RichEmbed} from 'discord.js';
 import debug from 'debug';
 import findKey from 'lodash/findKey';
 import includes from 'lodash/includes'
@@ -75,4 +75,26 @@ export default function Config(msg: Message, args: string[]) {
 			msg.author.send(`${config.property} is not a valid property.`);
 			break;
 	}
+}
+
+export function help(): RichEmbed {
+	return new RichEmbed({
+		color: 0x000000,
+		title: 'Config Help',
+		description: 'Used to configure settings as needed.',
+		fields: [
+			{
+				name: 'Usage',
+				value: '!config [action] [property] [value]'
+			},
+			{
+				name: 'Actions',
+				value: 'set, update, remove'
+			},
+			{
+				name: 'Properties',
+				value: 'timezone, welcomechannel'
+			},
+		],
+	});
 }

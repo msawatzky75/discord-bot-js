@@ -29,6 +29,7 @@ Note: Docker is optional, but you will need to setup your own postgres server wi
 Every comamnd must export a function as an interface for the command. Available arguments are the messgae object, the user object, and an array of arguments from the message.
 
 Each command should be exported from the [index](commands/index.ts) in the commands folder. Anything else needed will be referenced directly to the file.
+Each command file should also export a `help` method that returns a RichEmbed object detailing usage for the user to see.
 
 
 ## Bot Commands
