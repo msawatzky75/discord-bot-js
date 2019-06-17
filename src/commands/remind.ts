@@ -7,6 +7,7 @@ import {
 import moment, {Moment} from 'moment-timezone';
 import wordsToNumbers from 'words-to-numbers';
 import findKey from 'lodash/findKey';
+import find from 'lodash/find';
 import {client, pgclient} from '../index';
 
 const d = debug('bot.src.commands.remind');
@@ -25,8 +26,12 @@ export class Reminder {
 	userId: Snowflake;
 	date: Moment;
 	message: string;
+	static readonly shortcuts: {regex: RegExp, date: Moment}[] = [
+		{regex: /tomorrow/i, date: moment().add(1, 'days')}, // convert these to an args array
+		{regex: /next week/i, date: moment().add(1, 'weeks')},
+	];
 
-	static getNextId() { return this.lastId++; }
+	private static getNextId() { return this.lastId++; }
 
 	static load({userId, date, message}: {userId: Snowflake, date: string, message: string}) {
 		client.fetchUser(userId).then(user => {
@@ -65,6 +70,24 @@ export class Reminder {
 		return moment().add(quantity, magnitude);
 	}
 
+	static isShortcut(userId: string, args: string[]): boolean {
+		return Reminder.shortcuts.find(s => s.regex.test(args[0])) !== null
+			|| Reminder.shortcuts.find(s => s.regex.test(`${args[0]} ${args[1]}`)) !== null;
+	}
+
+	static getShortcut(userId: string, args: string[]): Reminder {
+		const reminder = new Reminder();
+		if (Reminder.shortcuts.find(s => s.regex.test(args[0])) !== null) {
+			reminder.date = Reminder.shortcuts.find(s => s.regex.test(args.shift())).date;
+			reminder.message = args.join(' ');
+		}
+		if (Reminder.shortcuts.find(s => s.regex.test(`${args[0]} ${args[1]}`)) !== null) {
+			reminder.date = Reminder.shortcuts.find(s => s.regex.test(`${args.shift()} ${args.shift()}`)).date;
+			reminder.message = args.join(' ');
+		}
+		return reminder;
+	}
+
 	static parseQuantity(input: string): number {
 		if (/^\d+(\.\d+)?$/.test(input)) {
 			return Number(input);
@@ -76,31 +99,42 @@ export class Reminder {
 
 	static parseMagnitude(input: string): Magnitude | null {
 		return findKey({
-			[Magnitude.minute]: /min(ute(s)?)?/,
-			[Magnitude.hour]: /hour(s)?|hr(s)?/,
-			[Magnitude.day]: /day(s)?/,
-			[Magnitude.week]: /week(s)?/,
-			[Magnitude.month]: /month(s)?/,
-			[Magnitude.year]: /year(s)?/,
+			[Magnitude.minute]: /min(ute(s)?)?/i,
+			[Magnitude.hour]: /hour(s)?|hr(s)?/i,
+			[Magnitude.day]: /day(s)?/i,
+			[Magnitude.week]: /week(s)?/i,
+			[Magnitude.month]: /month(s)?/i,
+			[Magnitude.year]: /year(s)?/i,
 		}, val => val.test(input)) as Magnitude || null;
 	}
 
 	constructor(userId?: Snowflake, args?: string[]) {
-		this.id = Reminder.getNextId();
-		this.userId = userId;
-		this.date = Reminder.parseTime(args.shift(), args.shift());
-		this.message = args.join(' ');
+		if (args) {
+			if (Reminder.isShortcut(userId, args)) {
+				const shortcut = Reminder.getShortcut(userId, args);
+				Object.assign(this, shortcut);
+			}
+			else {
+				this.id = Reminder.getNextId();
+				this.userId = userId;
+				this.date = Reminder.parseTime(args.shift(), args.shift());
+				this.message = args.join(' ');
+			}
+		}
+		else {
+			this.id = Reminder.getNextId();
+		}
 	}
 
 	valid(): boolean {
 		return this.userId && moment.isMoment(this.date);
 	}
-};
+}
 
 export function LoadReminders() {
 	pgclient.query({
 		text: "select userId, date, message from reminders where date > current_timestamp",
-	}).then(({rows}) => rows.forEach(Reminder.load)).catch(d)
+	}).then(({rows}) => rows.forEach(Reminder.load)).catch(d);
 }
 
 export default function Remind(user: User, args: string[]): void {
