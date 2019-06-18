@@ -26,9 +26,9 @@ export class Reminder {
 	userId: Snowflake;
 	date: Moment;
 	message: string;
-	static readonly shortcuts: {regex: RegExp, date: Moment}[] = [
-		{regex: /tomorrow/i, date: moment().add(1, 'days')}, // convert these to an args array
-		{regex: /next week/i, date: moment().add(1, 'weeks')},
+	static readonly shortcuts: {regex: RegExp, getDate: Function}[] = [
+		{regex: /tomorrow/i, getDate: (): Moment => moment().add(1, 'days')}, // convert these to an args array
+		{regex: /next week/i, getDate: (): Moment => moment().add(1, 'weeks')},
 	];
 
 	private static getNextId() { return this.lastId++; }
@@ -78,7 +78,8 @@ export class Reminder {
 	static getShortcut(userId: string, args: string[]): Reminder {
 		const reminder = new Reminder();
 		if (Reminder.shortcuts.find(s => s.regex.test(args[0])) !== null) {
-			reminder.date = Reminder.shortcuts.find(s => s.regex.test(args.shift())).date;
+			const shortcut: Moment = Reminder.shortcuts.find(s => s.regex.test(args.shift())).getDate();
+			reminder.date = shortcut ? shortcut : moment();
 			reminder.message = args.join(' ');
 		}
 		if (Reminder.shortcuts.find(s => s.regex.test(`${args[0]} ${args[1]}`)) !== null) {
