@@ -1,5 +1,9 @@
 version: "3.3"
 services:
+  app:
+    image: msawatzky75/discord-bot-js
+    restart: always
+    environment:
   db:
     image: postgres
     restart: always
