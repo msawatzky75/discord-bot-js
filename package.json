@@ -9,7 +9,7 @@
     "build": "tsc",
     "db": "DEBUG=* ts-node src/initdb.ts",
     "dev": "DEBUG=bot.* nodemon src/index.ts",
-    "start": "DEBUG=bot.* tsc && node build/index.js",
+    "start": "tsc-node build/index.js",
     "test": "TEST=true mocha --require ts-node/register test/**/*.ts"
   },
   "dependencies": {
