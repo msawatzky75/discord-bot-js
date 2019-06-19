@@ -1,5 +1,4 @@
 import path from 'path';
-// const path = require('path');
 import {IgnorePlugin} from 'webpack';
 import Dotenv from 'dotenv-webpack';
 
