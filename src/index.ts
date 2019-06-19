@@ -11,9 +11,8 @@ const pgclient = new PGClient({connectionString: process.env.DATABASE_URL});
 
 // This is needed or the bot attempts to start while running tests.
 if (!process.env.TEST) {
-	Promise.all([client.login(process.env.TOKEN), pgclient.connect()]).then(() => {
-		d('Connected to discord and postgres');
-	}).catch(d);
+	client.login(process.env.TOKEN).catch(d);
+	pgclient.connect().then(() => d('Connected to postgres')).catch(d);
 }
 
 client.on('ready', () => {

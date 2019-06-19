@@ -1,9 +1,16 @@
-version: "3.3"
+version: "2"
 services:
   app:
     image: msawatzky75/discord-bot-js
     restart: always
     environment:
+      DEBUG: bot.*
+      PREFIX: !
+      TOKEN: MjgxOTg5MDUxNTkzMTI5OTk1.XPb6sw.mDFtod8oXwD3Y7oR1UKb3t12Q_s
+      DATABASE_URL: postgres://postgres:password@db:5432/discord_bot
+    depends_on:
+      - db
+
   db:
     image: postgres
     restart: always
@@ -17,3 +24,4 @@ services:
 
 volumes:
   data:
+

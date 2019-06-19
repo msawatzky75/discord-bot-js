@@ -6,10 +6,10 @@
   "author": "Matthew Sawatzky <34319870+msawatzky75@users.noreply.github.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "docker build . -t msawatzky75/discord-bot-js",
     "db": "DEBUG=* ts-node src/initdb.ts",
     "dev": "DEBUG=bot.* nodemon src/index.ts",
-    "start": "tsc-node build/index.js",
+    "start": "ts-node src/index.ts",
     "test": "TEST=true mocha --require ts-node/register test/**/*.ts"
   },
   "dependencies": {
@@ -21,6 +21,7 @@
     "moment-timezone": "^0.5.25",
     "pg": "^7.11.0",
     "ts-node": "^8.2.0",
+    "typescript": "^3.5.1",
     "words-to-numbers": "^1.5.1"
   },
   "devDependencies": {
@@ -39,7 +40,6 @@
     "eslint": "^5.16.0",
     "eslint-plugin-import": "^2.17.3",
     "mocha": "^6.1.4",
-    "nodemon": "^1.19.1",
-    "typescript": "^3.5.1"
+    "nodemon": "^1.19.1"
   }
 }

@@ -27,8 +27,8 @@ export class Reminder {
 	date: Moment;
 	message: string;
 	static readonly shortcuts: {regex: RegExp, getDate: () => Moment}[] = [
-		{regex: /tomorrow/i, getDate: () => moment().add(1, 'days')},
-		{regex: /next week/i, getDate: () => moment().add(1, 'weeks')},
+		{regex: /^tomorrow/i, getDate: () => moment().add(1, 'days')},
+		{regex: /^next week/i, getDate: () => moment().add(1, 'weeks')},
 	];
 
 	private static getNextId() { return this.lastId++; }
@@ -70,21 +70,21 @@ export class Reminder {
 		return moment().add(quantity, magnitude);
 	}
 
-	static isShortcut(userId: string, args: string[]): boolean {
-		return Reminder.shortcuts.find(s => s.regex.test(args[0])) !== null
-			|| Reminder.shortcuts.find(s => s.regex.test(`${args[0]} ${args[1]}`)) !== null;
+	static isShortcut(args: string[]): boolean {
+		return Reminder.shortcuts.find(s => s.regex.test(args[0])) !== undefined
+			|| Reminder.shortcuts.find(s => s.regex.test(`${args[0]} ${args[1]}`)) !== undefined;
 	}
 
-	static getShortcut(userId: string, args: string[]): Reminder {
+	static getShortcut(args: string[]): Reminder {
 		const reminder = new Reminder();
 		if (Reminder.shortcuts.find(s => s.regex.test(args[0])) !== null) {
-			const shortcut = Reminder.shortcuts.find(s => s.regex.test(args.shift())).getDate();
-			reminder.date = shortcut ? shortcut : moment();
+			const shortcut = Reminder.shortcuts.find(s => s.regex.test(args.shift()));
+			reminder.date = shortcut ? shortcut.getDate() : moment();
 			reminder.message = args.join(' ');
 		}
 		if (Reminder.shortcuts.find(s => s.regex.test(`${args[0]} ${args[1]}`)) !== null) {
-			const shortcut = Reminder.shortcuts.find(s => s.regex.test(`${args.shift()} ${args.shift()}`)).getDate();
-			reminder.date = shortcut ? shortcut : moment();
+			const shortcut = Reminder.shortcuts.find(s => s.regex.test(`${args.shift()} ${args.shift()}`));
+			reminder.date = shortcut ? shortcut.getDate() : moment();
 			reminder.message = args.join(' ');
 		}
 		return reminder;
@@ -111,20 +111,17 @@ export class Reminder {
 	}
 
 	constructor(userId?: Snowflake, args?: string[]) {
+		this.id = Reminder.getNextId();
+		this.userId = userId;
 		if (args) {
-			if (Reminder.isShortcut(userId, args)) {
-				const shortcut = Reminder.getShortcut(userId, args);
+			if (Reminder.isShortcut(args)) {
+				const shortcut = Reminder.getShortcut(args);
 				Object.assign(this, shortcut);
 			}
 			else {
-				this.id = Reminder.getNextId();
-				this.userId = userId;
 				this.date = Reminder.parseTime(args.shift(), args.shift());
 				this.message = args.join(' ');
 			}
-		}
-		else {
-			this.id = Reminder.getNextId();
 		}
 	}
 

@@ -8,4 +8,5 @@ COPY ./yarn.lock .
 COPY ./tsconfig.json .
 
 RUN yarn install
+RUN yarn global add ts-node
 CMD ["yarn", "start"]
