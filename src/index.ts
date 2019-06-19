@@ -1,10 +1,10 @@
 import debug from 'debug';
 import {Client} from 'discord.js';
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 import {Client as PGClient} from 'pg';
 import {Config, Help, Nickname, Remind, Sarcasm} from './commands';
 
-dotenv.config({path: `${__dirname}/../.env`});
+// dotenv.config({path: `${__dirname}/../.env`});
 const d = debug('bot.src.index');
 const client = new Client();
 const pgclient = new PGClient({connectionString: process.env.DATABASE_URL});
@@ -16,9 +16,9 @@ if (!process.env.TEST) {
 		d('connected to postgres, initializing');
 		pgclient.query({
 			text: `create table if not exists reminders(
-				userId text not null, 
-				date timestamp with time zone not null, 
-				message text, 
+				userId text not null,
+				date timestamp with time zone not null,
+				message text,
 				primary key (userId, date)
 			);
 				create table if not exists timezones(
@@ -65,7 +65,7 @@ client.on('message', msg => {
 					break;
 
 				default:
-					console.log(`${msg.author.tag} tried ${msg.content}`);
+					d(`${msg.author.tag} tried ${msg.content}`);
 					break;
 			}
 		}
