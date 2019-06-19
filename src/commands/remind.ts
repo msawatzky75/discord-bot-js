@@ -7,7 +7,7 @@ import {
 import moment, {Moment} from 'moment-timezone';
 import wordsToNumbers from 'words-to-numbers';
 import findKey from 'lodash/findKey';
-import find from 'lodash/find';
+import drop from 'lodash/drop';
 import {client, pgclient} from '../index';
 
 const d = debug('bot.src.commands.remind');
@@ -26,9 +26,9 @@ export class Reminder {
 	userId: Snowflake;
 	date: Moment;
 	message: string;
-	static readonly shortcuts: {regex: RegExp, getDate: () => Moment}[] = [
-		{regex: /^tomorrow/i, getDate: () => moment().add(1, 'days')},
-		{regex: /^next week/i, getDate: () => moment().add(1, 'weeks')},
+	static readonly shortcuts: {regex: RegExp, args: string[]}[] = [
+		{regex: /^tomorrow/i, args: ['1', 'days']},
+		{regex: /^next\Wwee[kx]/i, args: ['7', 'days']},
 	];
 
 	private static getNextId() { return this.lastId++; }
@@ -52,12 +52,9 @@ export class Reminder {
 		// Parse values
 		const quantity: number = this.parseQuantity(quantityInput);
 		const magnitude: Magnitude = this.parseMagnitude(magnitudeInput);
+		d('Parsed:', quantity, magnitude);
 
 		// Validate values
-		if (!magnitude) {
-			d(magnitude);
-			throw new Error("Invalid Magnitude.");
-		}
 		if (isNaN(quantity)) {
 			d(quantity);
 			throw new Error("Invalid quantity");
@@ -66,7 +63,10 @@ export class Reminder {
 			d(quantity);
 			throw new Error("Quantity is too large. Try less than 1000.");
 		}
-
+		if (!magnitude) {
+			d(magnitude);
+			throw new Error("Invalid Magnitude.");
+		}
 		return moment().add(quantity, magnitude);
 	}
 
@@ -75,17 +75,15 @@ export class Reminder {
 			|| Reminder.shortcuts.find(s => s.regex.test(`${args[0]} ${args[1]}`)) !== undefined;
 	}
 
-	static getShortcut(args: string[]): Reminder {
-		const reminder = new Reminder();
-		if (Reminder.shortcuts.find(s => s.regex.test(args[0])) !== null) {
-			const shortcut = Reminder.shortcuts.find(s => s.regex.test(args.shift()));
-			reminder.date = shortcut ? shortcut.getDate() : moment();
-			reminder.message = args.join(' ');
+	static getShortcut(userId: string, args: string[]): Reminder {
+		let reminder = null;
+		if (this.shortcuts.find(s => s.regex.test(args[0])) !== undefined) {
+			const shortcut = this.shortcuts.find(s => s.regex.test(args[0]));
+			reminder = new Reminder(userId, shortcut.args.concat(drop(args, 1)));
 		}
-		if (Reminder.shortcuts.find(s => s.regex.test(`${args[0]} ${args[1]}`)) !== null) {
-			const shortcut = Reminder.shortcuts.find(s => s.regex.test(`${args.shift()} ${args.shift()}`));
-			reminder.date = shortcut ? shortcut.getDate() : moment();
-			reminder.message = args.join(' ');
+		else if (this.shortcuts.find(s => s.regex.test(`${args[0]} ${args[1]}`)) !== undefined) {
+			const shortcut = this.shortcuts.find(s => s.regex.test(`${args[0]} ${args[1]}`));
+			reminder = new Reminder(userId, shortcut.args.concat(drop(args, 2)));
 		}
 		return reminder;
 	}
@@ -115,7 +113,7 @@ export class Reminder {
 		this.userId = userId;
 		if (args) {
 			if (Reminder.isShortcut(args)) {
-				const shortcut = Reminder.getShortcut(args);
+				const shortcut = Reminder.getShortcut(userId, args);
 				Object.assign(this, shortcut);
 			}
 			else {
@@ -150,7 +148,7 @@ export default function Remind(user: User, args: string[]): void {
 					user.send('You have not configured your timezone yet, to do so use the config command like this: `' + process.env.PREFIX + 'config set timezone est.' +
 					' This message will be sent for every reminder you request until it is set. For now, all times will be shown in UTC.');
 				}
-				d(timezone);
+
 				user.send(`${reminder.date.tz(timezone).calendar()} you will be reminded of ${reminder.message || 'nothing'}.`);
 				reminders.set(reminder.id, setTimeout(() => {
 					user.send(`Reminder of '${reminder.message}'`);

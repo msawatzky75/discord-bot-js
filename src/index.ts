@@ -12,12 +12,28 @@ const pgclient = new PGClient({connectionString: process.env.DATABASE_URL});
 // This is needed or the bot attempts to start while running tests.
 if (!process.env.TEST) {
 	client.login(process.env.TOKEN).catch(d);
-	pgclient.connect().then(() => d('Connected to postgres')).catch(d);
+	pgclient.connect().then(() => {
+		d('connected to postgres, initializing');
+		pgclient.query({
+			text: `create table if not exists reminders(
+				userId text not null, 
+				date timestamp with time zone not null, 
+				message text, 
+				primary key (userId, date)
+			);
+				create table if not exists timezones(
+				userId text primary key,
+				timezone text not null
+			);
+			create table if not exists welcomes(
+				guildId text primary key,
+				channelId text not null
+			);`,
+		}).catch(d);
+	}).catch(d);
 }
 
-client.on('ready', () => {
-	console.log(`Logged in as ${client.user.tag}`);
-});
+client.on('ready', () => d(`Logged in as ${client.user.tag}`));
 
 client.on('message', msg => {
 	if (msg.content.startsWith(process.env.PREFIX)) {
