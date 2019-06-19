@@ -20,6 +20,7 @@
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.25",
     "pg": "^7.11.0",
+    "ts-node": "^8.2.0",
     "words-to-numbers": "^1.5.1"
   },
   "devDependencies": {
@@ -39,7 +40,6 @@
     "eslint-plugin-import": "^2.17.3",
     "mocha": "^6.1.4",
     "nodemon": "^1.19.1",
-    "ts-node": "^8.2.0",
     "typescript": "^3.5.1"
   }
 }
