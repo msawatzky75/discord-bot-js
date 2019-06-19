@@ -1,6 +1,7 @@
-const path = require('path');
-const {IgnorePlugin} = require('webpack');
-const Dotenv = require('dotenv-webpack');
+import path from 'path';
+// const path = require('path');
+import {IgnorePlugin} from 'webpack';
+import Dotenv from 'dotenv-webpack';
 
 module.exports = {
 	mode: 'development',

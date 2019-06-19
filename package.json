@@ -13,6 +13,8 @@
     "test": "TEST=true mocha --require ts-node/register test/**/*.ts"
   },
   "dependencies": {
+    "@types/dotenv-webpack": "^1.7.0",
+    "@types/webpack": "^4.4.33",
     "debug": "^4.1.1",
     "discord.js": "^11.5.0",
     "dotenv": "^8.0.0",
