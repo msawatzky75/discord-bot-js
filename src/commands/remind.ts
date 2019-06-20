@@ -13,6 +13,15 @@ import {client, pgclient} from '../index';
 const d = debug('bot.src.commands.remind');
 const reminders: Collection<number, NodeJS.Timer> = new Collection<number, NodeJS.Timer>();
 
+function addReminder(reminder: Reminder, user: User) {
+	reminders.set(reminder.id, setTimeout(() => {
+		user.send(`Reminder of '${reminder.message}'`);
+		d(`Sent reminder to ${user.tag} with message ${reminder.message}`);
+		reminders.delete(reminder.id);
+	}, reminder.date.utc().diff(moment.utc())));
+	d('reminder set', reminder);
+}
+
 enum Magnitude { minute = "minutes", hour = "hours", day = "days", week = "weeks", month = "months", year = "years" }
 export interface Reminder {
 	userId: Snowflake,
@@ -21,7 +30,7 @@ export interface Reminder {
 }
 
 export class Reminder {
-	private static lastId: number = -1;
+	private static lastId: number = 0;
 	id: number;
 	userId: Snowflake;
 	date: Moment;
@@ -33,18 +42,13 @@ export class Reminder {
 
 	private static getNextId() { return this.lastId++; }
 
-	static load({userId, date, message}: {userId: Snowflake, date: string, message: string}) {
-		client.fetchUser(userId).then(user => {
-			const reminder = new Reminder();
-			reminder.userId = userId;
+	static load({userid, date, message}: {userid: Snowflake, date: string, message: string}) {
+		client.fetchUser(userid).then(user => {
+			const reminder = new Reminder(userid);
 			reminder.date = moment(date);
 			reminder.message = message;
 
-			reminders.set(reminder.id, setTimeout(() => {
-				user.send(`Reminder of '${reminder.message}'`);
-				d(`Sent reminder to ${user.tag} with message ${reminder.message}`);
-				reminders.delete(reminder.id);
-			}, reminder.date.utc().diff(moment.utc())));
+			addReminder(reminder, user);
 		});
 	}
 
@@ -106,7 +110,7 @@ export class Reminder {
 		}, val => val.test(input)) as Magnitude || null;
 	}
 
-	constructor(userId?: Snowflake, args?: string[]) {
+	constructor(userId: Snowflake, args?: string[]) {
 		this.id = Reminder.getNextId();
 		this.userId = userId;
 		if (args) {
@@ -121,8 +125,8 @@ export class Reminder {
 		}
 	}
 
-	valid(): boolean {
-		return this.userId && moment.isMoment(this.date);
+	toString(): string {
+		return `${this.message} to ${this.userId} on ${this.date.calendar()}.`;
 	}
 }
 
@@ -135,7 +139,7 @@ export function loadReminders() {
 export default function Remind(user: User, args: string[]): void {
 	const reminder = new Reminder(user.id, args);
 
-	if (reminder.valid()) {
+	if (reminder.date !== undefined) {
 		pgclient.query({
 			text: 'insert into reminders(userId, date, message) values($1, $2, $3)',
 			values: [reminder.userId, reminder.date.toISOString(true), reminder.message],
@@ -148,11 +152,7 @@ export default function Remind(user: User, args: string[]): void {
 				}
 
 				user.send(`${reminder.date.tz(timezone).calendar()} you will be reminded of ${reminder.message || 'nothing'}.`);
-				reminders.set(reminder.id, setTimeout(() => {
-					user.send(`Reminder of '${reminder.message}'`);
-					d(`Sent reminder to ${user.tag} with message ${reminder.message}`);
-					reminders.delete(reminder.id);
-				}, reminder.date.utc().diff(moment.utc())));
+				addReminder(reminder, user);
 			});
 		}).catch(err => {
 			user.send("There was an error saving the reminder.");
