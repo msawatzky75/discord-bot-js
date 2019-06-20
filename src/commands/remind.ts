@@ -75,15 +75,13 @@ export class Reminder {
 			|| Reminder.shortcuts.find(s => s.regex.test(`${args[0]} ${args[1]}`)) !== undefined;
 	}
 
-	static getShortcut(userId: string, args: string[]): Reminder {
+	static getShortcut(args: string[]): string[] {
 		let reminder = null;
 		if (this.shortcuts.find(s => s.regex.test(args[0])) !== undefined) {
-			const shortcut = this.shortcuts.find(s => s.regex.test(args[0]));
-			reminder = new Reminder(userId, shortcut.args.concat(drop(args, 1)));
+			return this.shortcuts.find(s => s.regex.test(args[0])).args.concat(drop(args, 1));
 		}
 		else if (this.shortcuts.find(s => s.regex.test(`${args[0]} ${args[1]}`)) !== undefined) {
-			const shortcut = this.shortcuts.find(s => s.regex.test(`${args[0]} ${args[1]}`));
-			reminder = new Reminder(userId, shortcut.args.concat(drop(args, 2)));
+			return this.shortcuts.find(s => s.regex.test(`${args[0]} ${args[1]}`)).args.concat(drop(args, 2));
 		}
 		return reminder;
 	}
@@ -113,13 +111,13 @@ export class Reminder {
 		this.userId = userId;
 		if (args) {
 			if (Reminder.isShortcut(args)) {
-				const shortcut = Reminder.getShortcut(userId, args);
-				Object.assign(this, shortcut);
+				d('recognized shortcut');
+				args = Reminder.getShortcut(args);
 			}
-			else {
-				this.date = Reminder.parseTime(args.shift(), args.shift());
-				this.message = args.join(' ');
-			}
+
+			// continue parsing
+			this.date = Reminder.parseTime(args.shift(), args.shift());
+			this.message = args.join(' ');
 		}
 	}
 
@@ -128,7 +126,7 @@ export class Reminder {
 	}
 }
 
-export function LoadReminders() {
+export function loadReminders() {
 	pgclient.query({
 		text: "select userId, date, message from reminders where date > current_timestamp",
 	}).then(({rows}) => rows.forEach(Reminder.load)).catch(d);

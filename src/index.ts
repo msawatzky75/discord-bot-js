@@ -1,7 +1,11 @@
 import debug from 'debug';
-import {Client} from 'discord.js';
+import {
+	Client,
+	PresenceStatus,
+} from 'discord.js';
 import {Client as PGClient} from 'pg';
 import {Config, Help, Nickname, Remind, Sarcasm} from './commands';
+import {loadReminders} from './commands/remind';
 
 const d = debug('bot.src.index');
 const client = new Client();
@@ -28,16 +32,21 @@ if (!process.env.TEST) {
 				channelId text not null
 			);`,
 		}).catch(d);
+		loadReminders();
 	}).catch(d);
 }
 
-client.on('ready', () => d(`Logged in as ${client.user.tag}`));
+client.on('ready', () => {
+	d(`Logged in as ${client.user.tag}`);
+	d('setting status as online');
+	client.user.setStatus('online' as PresenceStatus);
+});
 
 client.on('message', msg => {
 	if (msg.content.startsWith(process.env.PREFIX)) {
 		const args: string[] = msg.content.split(' ');
 		const command: string = args.shift().substring(1);
-		d('received command', command, args);
+		d('received command', [command, ...args]);
 
 		try {
 			switch(command) {
@@ -64,12 +73,13 @@ client.on('message', msg => {
 
 				default:
 					d(`${msg.author.tag} tried ${msg.content}`);
+					d('nothing registered to handle that.');
 					break;
 			}
 		}
 		catch (e) {
-			d(e);
 			msg.author.send(e.message);
+			d(e);
 		}
 	}
 });

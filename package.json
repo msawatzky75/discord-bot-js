@@ -9,6 +9,7 @@
     "build": "webpack",
     "db": "DEBUG=* ts-node src/initdb.ts",
     "dev": "DEBUG=bot.* nodemon src/index.ts",
+	  "lint": "eslint src/**/* --ext *.ts",
     "start": "ts-node src/index.ts",
     "test": "TEST=true mocha --require ts-node/register test/**/*.ts"
   },
