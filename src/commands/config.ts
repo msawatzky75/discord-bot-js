@@ -97,15 +97,15 @@ export function help(): RichEmbed {
 		fields: [
 			{
 				name: 'Usage',
-				value: '!config [action] [property] [value]',
+				value: `${process.env.PREFIX}config [action] [property] [value]`,
 			},
 			{
 				name: 'Actions',
-				value: 'set, update, remove',
+				value: 'set | update | remove',
 			},
 			{
 				name: 'Properties',
-				value: 'timezone, welcomechannel',
+				value: 'timezone',
 			},
 		],
 	});

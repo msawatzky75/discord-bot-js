@@ -1,6 +1,7 @@
 import debug from 'debug';
 import {
 	Collection,
+	RichEmbed,
 	Snowflake,
 	User,
 } from 'discord.js';
@@ -130,12 +131,6 @@ export class Reminder {
 	}
 }
 
-export function loadReminders() {
-	pgclient.query({
-		text: "select userId, date, message from reminders where date > current_timestamp",
-	}).then(({rows}) => rows.forEach(Reminder.load)).catch(d);
-}
-
 export default function Remind(user: User, args: string[]): void {
 	const reminder = new Reminder(user.id, args);
 
@@ -159,4 +154,36 @@ export default function Remind(user: User, args: string[]): void {
 			d(err);
 		});
 	}
+}
+
+export function loadReminders() {
+	pgclient.query({
+		text: "select userId, date, message from reminders where date > current_timestamp",
+	}).then(({rows}) => rows.forEach(Reminder.load)).catch(d);
+}
+
+export function help(): RichEmbed {
+	return new RichEmbed({
+		color: 0x000000,
+		title: 'Remind Help',
+		description: 'Used to remind you of anything you need.',
+		fields: [
+			{
+				name: 'Usage',
+				value: `${process.env.PREFIX}remind [shortcut OR [magnitude] [prefix]] [message]`,
+			},
+			{
+				name: 'shortcut',
+				value: 'tomorrow | next week',
+			},
+			{
+				name: 'magnitude',
+				value: 'Any number less than 1000. Words or numbers are allowed.',
+			},
+			{
+				name: 'message',
+				value: 'Literally anything you want.',
+			},
+		],
+	});
 }
