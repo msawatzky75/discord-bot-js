@@ -4,7 +4,7 @@ import {
 	PresenceStatus,
 } from 'discord.js';
 import {Client as PGClient} from 'pg';
-import {Config, Help, Nickname, Remind, Sarcasm} from './commands';
+import {config, help, remind, sarcasm} from './commands';
 import {loadReminders} from './commands/remind';
 
 const d = debug('bot.src.index');
@@ -50,25 +50,21 @@ client.on('message', msg => {
 
 		try {
 			switch(command) {
-				case 'setnick':
-					Nickname(msg, args);
+				case 'config':
+					config(msg, args);
+					break;
+
+				case 'help':
+					help(msg, args);
 					break;
 
 				case 'remindme':
 				case 'remind':
-					Remind(msg.author, args);
+					remind(msg.author, args);
 					break;
 
 				case 'sarcasm':
-					Sarcasm(msg, args);
-					break;
-
-				case 'config':
-					Config(msg, args);
-					break;
-
-				case 'help':
-					Help(msg, args);
+					sarcasm(msg, args);
 					break;
 
 				default:
@@ -82,10 +78,6 @@ client.on('message', msg => {
 			d(e);
 		}
 	}
-});
-
-client.on('guildMemberAdd', member => {
-	// Welcome(member);
 });
 
 export {client, pgclient};

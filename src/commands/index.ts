@@ -1,13 +1,13 @@
-import Config from './config';
-import Help from './help';
-import Nickname from './nickname';
-import Remind from './remind';
-import Sarcasm from './sarcasm';
+import config from './config';
+import help from './help';
+import nickname from './nickname';
+import remind from './remind';
+import sarcasm from './sarcasm';
 
 export {
-	Config,
-	Help,
-	Nickname,
-	Remind,
-	Sarcasm,
+	config,
+	help,
+	nickname,
+	remind,
+	sarcasm,
 };
