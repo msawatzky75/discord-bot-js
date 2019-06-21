@@ -7,7 +7,6 @@
   "license": "MIT",
   "scripts": {
     "build": "webpack",
-    "db": "DEBUG=* ts-node src/initdb.ts",
     "dev": "DEBUG=bot.* nodemon src/index.ts",
 	  "lint": "eslint src/**/* --ext *.ts",
     "start": "ts-node src/index.ts",
