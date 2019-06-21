@@ -20,7 +20,7 @@ function addReminder(reminder: Reminder, user: User) {
 		d(`Sent reminder to ${user.tag} with message ${reminder.message}`);
 		reminders.delete(reminder.id);
 	}, reminder.date.utc().diff(moment.utc())));
-	d('reminder set', reminder);
+	d('reminder set', reminder.toString());
 }
 
 enum Magnitude { minute = "minutes", hour = "hours", day = "days", week = "weeks", month = "months", year = "years" }
