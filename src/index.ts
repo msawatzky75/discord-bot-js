@@ -19,7 +19,7 @@ if (!process.env.TEST) {
 client.on('ready', () => {
 	d(`Logged in as ${client.user.tag}`);
 	d('setting status as online');
-	client.user.setStatus('online' as PresenceStatus);
+	client.user.setStatus('online' as PresenceStatus).catch(d);
 	pgclient.connect().then(() => {
 		d('connected to postgres, initializing');
 		pgclient.query({
@@ -75,6 +75,7 @@ client.on('message', msg => {
 		}
 		catch (e) {
 			msg.author.send(e.message);
+			d('this is for hoping we know what happened.');
 			d(e);
 		}
 	}
