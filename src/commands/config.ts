@@ -72,7 +72,7 @@ export default function Config(msg: Message, args: string[]) {
 			}
 			if (config.value) {
 				pgclient.query({
-					text: "select timezone from timezones where userId = $1",
+					text: 'select timezone from timezones where userId = $1',
 					values: [msg.author.id],
 				}).then(({rows, rowCount}) => {
 					const prevTimezone = rows[0] ? rows[0].timezone : 'unset';

@@ -11,6 +11,7 @@ import findKey from 'lodash/findKey';
 import drop from 'lodash/drop';
 import {client, pgclient} from '../index';
 
+require('dotenv').config();
 const d = debug('bot.src.commands.remind');
 const reminders: Collection<number, NodeJS.Timer> = new Collection<number, NodeJS.Timer>();
 
@@ -23,7 +24,7 @@ function addReminder(reminder: Reminder, user: User) {
 	d('reminder set', reminder.toString());
 }
 
-enum Magnitude { minute = "minutes", hour = "hours", day = "days", week = "weeks", month = "months", year = "years" }
+enum Magnitude { minute = 'minutes', hour = 'hours', day = 'days', week = 'weeks', month = 'months', year = 'years' }
 export interface Reminder {
 	userId: Snowflake,
 	date: Moment,
@@ -62,15 +63,15 @@ export class Reminder {
 		// Validate values
 		if (isNaN(quantity)) {
 			d(quantity);
-			throw new Error("Invalid quantity");
+			throw new Error('Invalid quantity');
 		}
 		if (quantity > 1000) {
 			d(quantity);
-			throw new Error("Quantity is too large. Try less than 1000.");
+			throw new Error('Quantity is too large. Try less than 1000.');
 		}
 		if (!magnitude) {
 			d(magnitude);
-			throw new Error("Invalid Magnitude.");
+			throw new Error('Invalid Magnitude.');
 		}
 		return moment().add(quantity, magnitude);
 	}
@@ -139,7 +140,7 @@ export default function Remind(user: User, args: string[]): void {
 			text: 'insert into reminders(userId, date, message) values($1, $2, $3)',
 			values: [reminder.userId, reminder.date.toISOString(true), reminder.message],
 		}).then(() => {
-			pgclient.query("select timezone from timezones where userId = $1", [user.id]).then(({rows}) => {
+			pgclient.query('select timezone from timezones where userId = $1', [user.id]).then(({rows}) => {
 				const timezone: string = rows[0] ? rows[0].timezone : 'utc';
 				if (timezone === 'utc') {
 					user.send('You have not configured your timezone yet, to do so use the config command like this: `' + process.env.PREFIX + 'config set timezone est.' +
@@ -150,7 +151,7 @@ export default function Remind(user: User, args: string[]): void {
 				addReminder(reminder, user);
 			});
 		}).catch(err => {
-			user.send("There was an error saving the reminder.");
+			user.send('There was an error saving the reminder.');
 			d(err);
 		});
 	}
@@ -158,7 +159,7 @@ export default function Remind(user: User, args: string[]): void {
 
 export function loadReminders() {
 	pgclient.query({
-		text: "select userId, date, message from reminders where date > current_timestamp",
+		text: 'select userId, date, message from reminders where date > current_timestamp',
 	}).then(({rows}) => rows.forEach(Reminder.load)).catch(d);
 }
 
