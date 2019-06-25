@@ -14,7 +14,6 @@ export default function SetNickname(msg: Message, args: string[]) {
 
 	// cannot be in dm channels
 	if (msg.channel.type !== 'text') {
-		d(msg.channel);
 		throw new Error('That command can only be used in guild text channels.');
 	}
 
