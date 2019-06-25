@@ -17,6 +17,12 @@ Marty bot is built into docker containers and can be found at [Docker Hub](https
 Note: Docker is optional, but you will need to setup your own postgres server with a database that matches your connection string (configured in [.env](.env)).
 That being said, using Docker is the easiest approach, though not ideal for development.
 
+### Building the Bot
+
+Run `docker build -t msawatzky75/discord-bot-js .` to build and tag as latest.
+
+If you just want a local copy of the build, see `yarn build` below. Alternatively, if you didn't want it bundled, you can just run `tsc`.
+
 ### Running the Bot
 1. Run `docker-compose up` in the project folder.
 
@@ -62,15 +68,20 @@ Not yet complete.
 
 
 ### Help
-Not yet complete.
+Used to list the help for a command.
 
-<!-- Used to list the help for a command.
+Usage: `!help [command name]`
 
-Usage: `!help [command name]` -->
+NOTE: This command will fail if your command file does not export a `help => RichEmbed` method.
 
 
 ### Nickname
-Not yet complete.
+Used to set nicknames of other guild members.
+
+Usage: `!nickname [@user] [text under 32 characters]`
+
+NOTE: The manage nicknames permission is required for this command to work. 
+The command will also fail if you are trying to change the nick name of a member that has a superior role, or is the owner of the server.
 
 
 ### Remind
@@ -82,3 +93,5 @@ Usage: `!remind 1 hour cook dinner`
 
 ### Sarcasm
 Capitalizes every other letter of text provided.
+
+Usage: `!sarcasm [any text]`
