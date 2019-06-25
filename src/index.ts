@@ -4,7 +4,13 @@ import {
 	PresenceStatus,
 } from 'discord.js';
 import {Client as PGClient} from 'pg';
-import {config, help, remind, sarcasm} from './commands';
+import {
+	config,
+	help,
+	nickname,
+	remind,
+	sarcasm,
+} from './commands';
 import {loadReminders} from './commands/remind';
 
 const d = debug('bot.src.index');
@@ -67,6 +73,11 @@ client.on('message', msg => {
 					sarcasm(msg, args);
 					break;
 
+				case 'setnick':
+				case 'nickname':
+					nickname(msg, args);
+					break;
+
 				default:
 					d(`${msg.author.tag} tried ${msg.content}`);
 					d('nothing registered to handle that.');
@@ -74,11 +85,18 @@ client.on('message', msg => {
 			}
 		}
 		catch (e) {
-			msg.author.send(e.message);
+			msg.channel.send(e.message).catch(() => {
+				msg.author.send(e.message);
+			});
 			d('this is for hoping we know what happened.');
 			d(e);
 		}
 	}
+});
+
+client.on('error', e => {
+	d('oof');
+	d(e);
 });
 
 export {client, pgclient};

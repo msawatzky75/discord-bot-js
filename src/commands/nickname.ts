@@ -1,3 +1,4 @@
+import debug from 'debug';
 import {
 	Message,
 	MessageMentions,
@@ -5,16 +6,26 @@ import {
 	User,
 } from 'discord.js';
 
+const d = debug('bot.src.commands.nickname');
+
 export default function SetNickname(msg: Message, args: string[]) {
 	const mention: User = msg.mentions.users.first();
 	const name: string = args.filter(s => !s.match(MessageMentions.USERS_PATTERN)).join(' ');
+
+	// cannot be in dm channels
+	if (msg.channel.type !== 'text') {
+		d(msg.channel);
+		throw new Error('That command can only be used in guild text channels.');
+	}
 
 	// cannot be server owner.
 	if (mention.id === msg.guild.ownerID) {
 		throw new Error('Cannot change the nickname of the server owner.');
 	}
 
-	return msg.guild.fetchMember(mention).then(u => u.setNickname(name)).catch(e => {throw e;});
+	msg.guild.fetchMember(mention).then(u => {
+		u.setNickname(name).catch(e => {throw e;});
+	});
 }
 
 export function help(): RichEmbed {
@@ -29,11 +40,11 @@ export function help(): RichEmbed {
 			},
 			{
 				name: '@username',
-				value: 'any @ mentionable user',
+				value: 'Any @ mentionable user.',
 			},
 			{
 				name: 'nickname',
-				value: 'any valid nickname (as per discord specs) 32 characters or under.',
+				value: 'Any valid nickname (as per discord specs) 32 characters or under.',
 			},
 		],
 	});
