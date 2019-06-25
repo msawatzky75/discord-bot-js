@@ -128,7 +128,7 @@ export class Reminder {
 	}
 
 	toString(): string {
-		return `${this.message} to ${this.userId} on ${this.date.calendar()}.`;
+		return `'${this.message}' to ${this.userId} on ${this.date.calendar()}.`;
 	}
 }
 
