@@ -11,6 +11,7 @@ enum CommandName {
 	nickname = 'nickname',
 	remind = 'remind',
 	sarcasm = 'sarcasm',
+	invalid = 'invalid',
 }
 
 export {
@@ -29,5 +30,5 @@ export function normalizeCommandName(input: string): CommandName {
 		[CommandName.nickname]: /(set)?nick(name)?/i,
 		[CommandName.remind]: /remind(me)?/i,
 		[CommandName.sarcasm]: /sarcasm/i,
-	}, val => val.test(input)) as CommandName || null;
+	}, val => val.test(input)) as CommandName || CommandName.invalid;
 }
