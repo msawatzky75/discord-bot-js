@@ -1,6 +1,7 @@
 import debug from 'debug';
 import {
 	Collection,
+	Message,
 	RichEmbed,
 	Snowflake,
 	User,
@@ -10,6 +11,7 @@ import wordsToNumbers from 'words-to-numbers';
 import findKey from 'lodash/findKey';
 import drop from 'lodash/drop';
 import {client, pgclient} from '../index';
+import {getUserConfig} from './config';
 
 require('dotenv').config();
 const d = debug('bot.src.commands.remind');
@@ -132,22 +134,22 @@ export class Reminder {
 	}
 }
 
-export default function Remind(user: User, args: string[]): void {
+export default function Remind(msg: Message, args: string[]): void {
+	const user = msg.author;
 	const reminder = new Reminder(user.id, args);
 
 	if (reminder.date !== undefined) {
 		pgclient.query({
-			text: 'insert into reminders(userId, date, message) values($1, $2, $3)',
+			text: 'insert into reminders(user_id, date, message) values($1, $2, $3)',
 			values: [reminder.userId, reminder.date.toISOString(true), reminder.message],
 		}).then(() => {
-			pgclient.query('select timezone from timezones where userId = $1', [user.id]).then(({rows}) => {
-				const timezone: string = rows[0] ? rows[0].timezone : 'utc';
-				if (timezone === 'utc') {
-					user.send('You have not configured your timezone yet, to do so use the config command like this: `' + process.env.PREFIX + 'config set timezone est.' +
+			getUserConfig(user.id).then(({timezone}) => {
+				if (timezone === undefined || timezone === null) {
+					user.send('You have not configured your timezone yet, to do so use the config command like this: `' + process.env.PREFIX + 'config set timezone est`.' +
 					' This message will be sent for every reminder you request until it is set. For now, all times will be shown in UTC.');
 				}
 
-				user.send(`${reminder.date.tz(timezone).calendar()} you will be reminded of ${reminder.message || 'nothing'}.`);
+				user.send(`${reminder.date.tz(timezone || 'utc').calendar()} you will be reminded of ${reminder.message || 'nothing'}.`);
 				addReminder(reminder, user);
 			});
 		}).catch(err => {

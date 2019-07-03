@@ -5,23 +5,24 @@ import {CommandName} from '../commands';
 
 const d = debug('bot.src.services.counter');
 
-export function countCommand(msg: Message) {
-	pgclient.query('select 1 from cmdcounts where userId = $1', [msg.author.id]).then(({rows}: {rows: {userId: string}[]}) => {
-		if (rows.length) {
-			//update
-			pgclient.query('update cmdcounts set incorrect = incorrect + 1 where userId = $1', [msg.author.id]).catch(d);
-		}
-		else {
-			//insert
-			pgclient.query('insert into cmdcounts (userId, incorrect) values ($1, 1)', [msg.author.id]).catch(d);
-		}
+export function countCommand(command: CommandName, msg: Message) {
+	pgclient.query('select id from commands where name = $1', [command]).then(({rows}) => {
+		const commandId = rows[0].id || -1;
+		pgclient.query('insert into sent_commands(user_id, date, channel_id, command_id, guild_id, message) values($1, $2);',
+			[msg.author.id, new Date(), msg.channel.id, commandId, msg.guild.id, msg.content]);
 	});
 }
 
-export function getCommandCount(command: CommandName, userId: string) {
-	let count = 0;
-	pgclient.query('select $1 from cmdcounts where userId = $2', [command, userId]).then(({rows}) => {
-		count = rows[0];
-	});
-	return count;
+export function getCommandCount(command: CommandName, userId: string): Promise<number> {
+	return new Promise(((resolve, reject) => {
+		pgclient.query('select id from commands where name = $1', [command]).then(({rows}) => {
+			const commandId = rows[0].id;
+			if (!commandId) {
+				reject({message: 'Invalid Command', commandId});
+			}
+			pgclient.query('select count(1) from sent_commands where user_id = $1 and command_id = $2', [userId, commandId]).then(({rows}) => {
+				resolve(rows[0]['count(1)']);
+			});
+		});
+	}));
 }

@@ -1,7 +1,9 @@
-import {Message, RichEmbed} from 'discord.js';
+import {Message, RichEmbed, Snowflake} from 'discord.js';
 import debug from 'debug';
+import camelCase from 'lodash/camelCase';
 import findKey from 'lodash/findKey';
 import includes from 'lodash/includes';
+import mapKeys from 'lodash/mapKeys';
 import {pgclient} from '../index';
 import moment from 'moment-timezone';
 
@@ -20,6 +22,10 @@ interface ConfigOptions {
 	type: ConfigType,
 	property: ConfigProperty,
 	value: string,
+}
+interface UserConfig {
+	userId: Snowflake,
+	timezone: string,
 }
 
 function parseConfigType(str: string): ConfigType {
@@ -72,12 +78,12 @@ export default function Config(msg: Message, args: string[]) {
 			}
 			if (config.value) {
 				pgclient.query({
-					text: 'select timezone from timezones where userId = $1',
+					text: 'select timezone from users where user_id = $1',
 					values: [msg.author.id],
 				}).then(({rows, rowCount}) => {
 					const prevTimezone = rows[0] ? rows[0].timezone : 'unset';
 					msg.author.send(`Changing timezone from '${prevTimezone}' to '${config.value}'`);
-					pgclient.query(rowCount ? 'update timezones set timezone = $2 where userId = $1' : 'insert into timezones(userId, timezone) values($1, $2)',
+					pgclient.query(rowCount ? 'update users set timezone = $2 where user_id = $1' : 'insert into users(user_id, timezone) values($1, $2)',
 						[msg.author.id, config.value]).catch(d);
 				});
 			}
@@ -87,6 +93,17 @@ export default function Config(msg: Message, args: string[]) {
 			msg.author.send(`${config.property} is not a valid property.`);
 			break;
 	}
+}
+
+export function getUserConfig(userId: Snowflake): Promise<UserConfig> {
+	return new Promise((resolve, reject) => {
+		pgclient.query('select * from users where user_id = $1', [userId]).then(({rows}) => {
+			if(rows[0]) {
+				resolve(mapKeys(rows[0], camelCase).toObject() as UserConfig);
+			}
+			reject('User Not Found');
+		}).catch(reject);
+	});
 }
 
 export function help(): RichEmbed {

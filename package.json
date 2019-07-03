@@ -9,7 +9,7 @@
     "build": "webpack",
     "dev": "env $(cat .env | grep -E \"^[^#]\") nodemon src/index.ts",
 	  "lint": "eslint src/**/* --ext *.ts",
-    "start": "$(cat .env | grep -E \"^[^#]\") ts-node src/index.ts",
+    "start": "env $(cat .env | grep -E \"^[^#]\") ts-node src/index.ts",
     "test": "TEST=true mocha --require ts-node/register test/**/*.ts"
   },
   "dependencies": {
