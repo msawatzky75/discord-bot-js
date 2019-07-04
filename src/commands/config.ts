@@ -106,6 +106,10 @@ export function getUserConfig(userId: Snowflake): Promise<UserConfig> {
 	});
 }
 
+export function addUserConfig(userId: Snowflake) {
+	pgclient.query('insert into users(user_id) values($1)', [userId]);
+}
+
 export function help(): RichEmbed {
 	return new RichEmbed({
 		color: 0x000000,

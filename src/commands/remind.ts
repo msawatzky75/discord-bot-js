@@ -151,7 +151,7 @@ export default function Remind(msg: Message, args: string[]): void {
 
 				user.send(`${reminder.date.tz(timezone || 'utc').calendar()} you will be reminded of ${reminder.message || 'nothing'}.`);
 				addReminder(reminder, user);
-			});
+			}).catch(() => addUserConfig(user.id));
 		}).catch(err => {
 			user.send('There was an error saving the reminder.');
 			d(err);
