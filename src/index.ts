@@ -1,11 +1,10 @@
 import debug from 'debug';
 import events from 'events';
-import {Client, Message} from 'discord.js';
+import {Client} from 'discord.js';
 import {Client as PGClient} from 'pg';
 import {countCommand, welcome} from './services';
 import {initialize} from './initialize';
 import {onMessage} from './message';
-import {CommandName} from './commands';
 
 const d = debug('bot.src.index');
 export const client = new Client();
@@ -21,4 +20,4 @@ client.once('ready', initialize);
 client.on('error', e => d('discord client error', e));
 client.on('guildMemberAdd', welcome);
 client.on('message', onMessage);
-emitter.on('beforeCommand', (command: CommandName, msg: Message) => countCommand(command, msg));
+emitter.on('beforeCommand', countCommand);

@@ -46,9 +46,9 @@ export class Reminder {
 
 	private static getNextId() { return this.lastId++; }
 
-	static load({userid, date, message}: {userid: Snowflake, date: string, message: string}) {
-		client.fetchUser(userid).then(user => {
-			const reminder = new Reminder(userid);
+	static load(userId: Snowflake, date: Moment | string, message: string): void {
+		client.fetchUser(userId).then(user => {
+			const reminder = new Reminder(userId);
 			reminder.date = moment(date);
 			reminder.message = message;
 
@@ -161,8 +161,8 @@ export default function Remind(msg: Message, args: string[]): void {
 
 export function loadReminders() {
 	pgclient.query({
-		text: 'select userId, date, message from reminders where date > current_timestamp',
-	}).then(({rows}) => rows.forEach(Reminder.load)).catch(d);
+		text: 'select user_id, date, message from reminders where date > current_timestamp',
+	}).then(({rows}) => rows.forEach(row => Reminder.load(row.user_id, row.date, row.message))).catch(d);
 }
 
 export function help(): RichEmbed {

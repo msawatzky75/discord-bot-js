@@ -3,6 +3,7 @@ import {Message} from 'discord.js';
 import {
 	CommandName,
 	config,
+	count,
 	help,
 	nickname,
 	normalizeCommandName,
@@ -24,6 +25,10 @@ export function onMessage(msg: Message) {
 			switch (command) {
 				case CommandName.config:
 					config(msg, args);
+					break;
+
+				case CommandName.count:
+					count(msg, args);
 					break;
 
 				case CommandName.help:

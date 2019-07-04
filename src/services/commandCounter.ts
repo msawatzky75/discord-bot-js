@@ -6,11 +6,9 @@ import {CommandName} from '../commands';
 const d = debug('bot.src.services.counter');
 
 export function countCommand(command: CommandName, msg: Message) {
-	pgclient.query('select id from commands where name = $1', [command]).then(({rows}) => {
-		const commandId = rows[0].id || -1;
-		pgclient.query('insert into sent_commands(user_id, date, channel_id, command_id, guild_id, message) values($1, $2);',
-			[msg.author.id, new Date(), msg.channel.id, commandId, msg.guild.id, msg.content]);
-	});
+	d(`counting command ${command} from ${msg.author.tag}`);
+	pgclient.query('insert into sent_commands(user_id, date, channel_id, command_name, guild_id, message) values($1, $2, $3, $4, $5, $6);',
+		[msg.author.id, new Date(), msg.channel.id, command, msg.guild ? msg.guild.id : null, msg.content]);
 }
 
 export function getCommandCount(command: CommandName, userId: string): Promise<number> {

@@ -8,6 +8,7 @@ export function initialize() {
 	d(`Logged in as ${client.user.tag}`);
 	d('setting status as online');
 	client.user.setStatus('online').catch(d);
+	client.user.setActivity(`${process.env.PREFIX}help`).catch(d);
 	pgclient.connect().then(() => {
 		d('connected to postgres. to initialize the database, refer to the readme.');
 		loadReminders();

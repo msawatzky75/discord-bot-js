@@ -1,4 +1,5 @@
 import config from './config';
+import count from './count';
 import help from './help';
 import nickname from './nickname';
 import remind from './remind';
@@ -7,6 +8,7 @@ import findKey from 'lodash/findKey';
 
 enum CommandName {
 	config = 'config',
+	count = 'count',
 	help = 'help',
 	nickname = 'nickname',
 	remind = 'remind',
@@ -17,6 +19,7 @@ enum CommandName {
 export {
 	CommandName,
 	config,
+	count,
 	help,
 	nickname,
 	remind,
@@ -26,6 +29,7 @@ export {
 export function normalizeCommandName(input: string): CommandName {
 	return findKey({
 		[CommandName.config]: /config/i,
+		[CommandName.count]: /count/i,
 		[CommandName.help]: /help/i,
 		[CommandName.nickname]: /(set)?nick(name)?/i,
 		[CommandName.remind]: /remind(me)?/i,
