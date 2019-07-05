@@ -23,7 +23,12 @@ export default function SetNickname(msg: Message, args: string[]) {
 	}
 
 	msg.guild.fetchMember(mention).then(u => {
-		u.setNickname(name).catch(e => {throw e;});
+		u.setNickname(name).catch(e => {
+			d(`Missing Permissions to change ${u.user.tag}'s nickname in ${msg.guild.name}`);
+			if (e.message === 'Missing Permissions') {
+				msg.reply('I don\'t have sufficient permissions to change that user\'s nickname.');
+			}
+		});
 	});
 }
 
