@@ -63,14 +63,17 @@ Usage: `!config [action] [property] [value]`
 ##### timezone
 Used by the `remind` command to inform you of the correct time it will remind you. For a list of available values, refer to [moment-timezone](https://momentjs.com/timezone/docs/)
 
-##### welcomechannel
-Not yet complete.
+### Count
+
+Used to see how many of what command you have sent.
+
+Usage: `!count [command_name | all | invalid]`
 
 
 ### Help
 Used to list the help for a command.
 
-Usage: `!help [command name]`
+Usage: `!help [command_name]`
 
 NOTE: This command will fail if your command file does not export a `help => RichEmbed` method.
 
