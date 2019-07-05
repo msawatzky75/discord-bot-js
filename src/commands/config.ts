@@ -1,4 +1,9 @@
-import {Message, RichEmbed, Snowflake} from 'discord.js';
+import {
+	Message,
+	RichEmbed,
+	Snowflake,
+	User,
+} from 'discord.js';
 import debug from 'debug';
 import camelCase from 'lodash/camelCase';
 import findKey from 'lodash/findKey';
@@ -90,8 +95,7 @@ export default function Config(msg: Message, args: string[]) {
 			break;
 
 		default:
-			msg.author.send(`${config.property} is not a valid property.`);
-			break;
+			throw new Error(`${config.property} is not a valid property.`);
 	}
 }
 
@@ -101,13 +105,13 @@ export function getUserConfig(userId: Snowflake): Promise<UserConfig> {
 			if(rows[0]) {
 				resolve(mapKeys(rows[0], camelCase).toObject() as UserConfig);
 			}
-			reject('User Not Found');
+			else {
+				pgclient.query('insert into users(user_id) values($1)', [userId]).then(() => {
+					resolve({userId, timezone: 'utc'});
+				});
+			}
 		}).catch(reject);
 	});
-}
-
-export function addUserConfig(userId: Snowflake) {
-	pgclient.query('insert into users(user_id) values($1)', [userId]);
 }
 
 export function help(): RichEmbed {

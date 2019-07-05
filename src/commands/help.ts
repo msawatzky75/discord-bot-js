@@ -2,18 +2,10 @@ import {
 	Message,
 	RichEmbed,
 } from 'discord.js';
-import includes from 'lodash/includes';
-import keys from 'lodash/keys';
-import map from 'lodash/map';
-import * as Commands from './index';
-
-export default function Help(msg: Message, args: string[]) {
-	const command = args.join(' ') || 'help';
-	if (includes(map(keys(Commands), (c: string) => c.toLowerCase()), command.toLowerCase())) {
-		// eslint-disable-next-line global-require
-		msg.author.send(require(`./${command}`).help());
-	}
-}
+import {
+	CommandName,
+	normalizeCommandName,
+} from './index';
 
 export function help(): RichEmbed {
 	// wow, really dont know what to do, do ya?
@@ -28,8 +20,25 @@ export function help(): RichEmbed {
 			},
 			{
 				name: 'Command',
-				value: 'config | help | remind | sarcasm',
+				value: Object.values(CommandName).map(cmd => cmd !== CommandName.invalid ? `${cmd}`: '').join(' | '),
 			},
 		],
 	});
+}
+
+export default function Help(msg: Message, args: string[]) {
+	const command = normalizeCommandName(args.join(' '));
+	if (command !== CommandName.invalid) {
+		// eslint-disable-next-line
+		const cmd = require(`./${command}`);
+		if (cmd.hasOwnProperty('help')) {
+			msg.author.send(cmd.help());
+		}
+		else {
+			msg.author.send('There is no help for that command yet.');
+		}
+	}
+	else {
+		msg.author.send(help());
+	}
 }
