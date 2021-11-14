@@ -4,7 +4,7 @@ import {inject, injectable} from "inversify";
 import {TYPES} from "./types";
 import {debug} from "debug";
 import {Logger} from "./logger";
-import {MessageResponder} from "./services/MessageResponedr";
+import {MessageResponder} from "./services/MessageResponeder";
 
 const d = debug("bot");
 

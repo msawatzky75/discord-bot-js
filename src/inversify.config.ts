@@ -3,7 +3,7 @@ import {TYPES} from "./types";
 import {Bot} from "./bot";
 import {Client, Intents} from "discord.js";
 import {PingFinder} from "./services/PingFinder";
-import {MessageResponder} from "./services/MessageResponedr";
+import {MessageResponder} from "./services/MessageResponeder";
 import {Logger} from "./logger";
 import dotenv from "dotenv";
 
