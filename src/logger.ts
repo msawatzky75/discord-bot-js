@@ -16,7 +16,8 @@ export class Logger {
 	public log(message: string): void {
 		this._log(message);
 	}
+
 	public error(error: Error): void {
-		this._log(`${typeof error} - ${error.message}`, "error");
+		this._log(`${error.name} - ${error.message}`, "error");
 	}
 }

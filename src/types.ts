@@ -4,5 +4,6 @@ export const TYPES = {
 	Token: Symbol("Token"),
 	Logger: Symbol("Logger"),
 	MessageResponder: Symbol("MessageResponder"),
-	PingFinder: Symbol("PingFinder"),
+	RoleStealer: Symbol("RoleStealer"),
+	StealableRoles: Symbol("StealableRoles"),
 };

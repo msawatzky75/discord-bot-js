@@ -4,7 +4,7 @@ import {inject, injectable} from "inversify";
 import {TYPES} from "./types";
 import {debug} from "debug";
 import {Logger} from "./logger";
-import {MessageResponder} from "./services/MessageResponder";
+import { RoleStealer } from "./services/RoleStealer";
 
 const d = debug("bot");
 
@@ -13,18 +13,18 @@ export class Bot {
 	private client: Client;
 	private token: string;
 	private logger: Logger;
-	private messageResponder: MessageResponder;
+	private roleStealer: RoleStealer;
 
 	constructor(
 		@inject(TYPES.Client) client: Client,
 		@inject(TYPES.Token) token: string,
-		@inject(TYPES.MessageResponder) messageResponder: MessageResponder,
+		@inject(TYPES.RoleStealer) roleStealer: RoleStealer,
 		@inject(TYPES.Logger) logger: Logger,
 	) {
 		this.client = client;
 		this.token = token;
 		this.logger = logger;
-		this.messageResponder = messageResponder;
+		this.roleStealer = roleStealer;
 	}
 
 	listen(): Promise<string> {
@@ -35,10 +35,12 @@ export class Bot {
 			}
 			this.logger.log(`Handling message: ${message.content}`);
 
-			this.messageResponder.handle(message).then(() => {
+			this.roleStealer.handle(message).then(() => {
 				this.logger.log("Message handled");
-			}).catch(() => {
-				this.logger.error(new Error("Message not handled"));
+			}).catch((e?: Error) => {
+				if (e) {
+					this.logger.error(e);
+				}
 			});
 		});
 
