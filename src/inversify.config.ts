@@ -10,14 +10,16 @@ dotenv.config();
 const container = new Container();
 
 container.bind<Bot>(TYPES.Bot).to(Bot).inSingletonScope();
-container.bind<Client>(TYPES.Client).toConstantValue(new Client({
-	intents: [
-		Intents.FLAGS.DIRECT_MESSAGES,
-		Intents.FLAGS.GUILDS,
-		Intents.FLAGS.GUILD_MESSAGES,
-		Intents.FLAGS.GUILD_MEMBERS,
-	],
-}));
+container.bind<Client>(TYPES.Client).toConstantValue(
+	new Client({
+		intents: [
+			Intents.FLAGS.DIRECT_MESSAGES,
+			Intents.FLAGS.GUILDS,
+			Intents.FLAGS.GUILD_MESSAGES,
+			Intents.FLAGS.GUILD_MEMBERS,
+		],
+	}),
+);
 container.bind<string>(TYPES.Token).toConstantValue(process.env.DISCORD_TOKEN);
 container.bind<Logger>(TYPES.Logger).to(Logger).inSingletonScope();
 container.bind<RoleStealer>(TYPES.RoleStealer).to(RoleStealer).inSingletonScope();

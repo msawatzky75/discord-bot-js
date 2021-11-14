@@ -1,13 +1,9 @@
 import "reflect-metadata";
-import {Client, GuildMember, Message} from "discord.js";
+import {Client, Message} from "discord.js";
 import {inject, injectable} from "inversify";
 import {TYPES} from "./types";
-import {debug} from "debug";
 import {Logger} from "./logger";
-import { RoleStealer } from "./services/RoleStealer";
-
-const d = debug("bot");
-
+import {RoleStealer} from "./services/RoleStealer";
 @injectable()
 export class Bot {
 	private client: Client;
@@ -35,13 +31,16 @@ export class Bot {
 			}
 			this.logger.log(`Handling message: ${message.content}`);
 
-			this.roleStealer.handle(message).then(() => {
-				this.logger.log("Message handled");
-			}).catch((e?: Error) => {
-				if (e) {
-					this.logger.error(e);
-				}
-			});
+			this.roleStealer
+				.handle(message)
+				.then(() => {
+					this.logger.log("Message handled");
+				})
+				.catch((e?: Error) => {
+					if (e) {
+						this.logger.error(e);
+					}
+				});
 		});
 
 		this.client.on("ready", () => {
