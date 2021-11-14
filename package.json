@@ -8,7 +8,8 @@
 	"scripts": {
 		"start": "node dist/index.js",
 		"watch": "tsc -p tsconfig.json -w",
-		"dev": "DEBUG='bot*' nodemon dist/index.js"
+		"dev": "DEBUG='bot*' nodemon dist/index.js",
+		"prettier": "prettier --write ."
 	},
 	"dependencies": {
 		"debug": "^4.3.2",
