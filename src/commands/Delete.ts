@@ -17,7 +17,7 @@ export class Delete implements ICommand {
 		return this.getEndOfCommandIndex(message, prefix) !== -1;
 	}
 
-	public handle(message: Message, prefix: string): Promise<Message | Message[]> {
+	public async handle(message: Message, prefix: string): Promise<Message | Message[]> {
 		const args = message.content.substring(this.getEndOfCommandIndex(message, prefix)).trim().split(" ");
 
 		if (args.length > 0) {
@@ -30,18 +30,17 @@ export class Delete implements ICommand {
 
 			this.logger.debug(`Deleting ${num} messages`);
 			if (message.channel instanceof TextChannel) {
-				this.logger.log(`Deleting ${num} messages from ${message.channel.name}`);
-				return message.channel.bulkDelete(num).then((messages) => {
-					// send confirmation message and self destruct
-					return message.channel.send(`Deleted ${messages.size} messages`).then((msg) => {
-						if (this.deleteConfirmation > 0) {
-							setTimeout(async () => {
-								msg.delete();
-							}, this.deleteConfirmation);
-						}
-						return msg;
-					});
-				});
+				this.logger.log(`Deleting (${num} + 1) messages from ${message.channel.name}`);
+				// add one for the command message
+				const deletedMessages = await message.channel.bulkDelete(num + 1);
+				// send confirmation message and self destruct
+				const msg = await message.channel.send(`Deleted ${deletedMessages.size - 1} messages`);
+				if (this.deleteConfirmation > 0) {
+					setTimeout(async () => {
+						msg.delete();
+					}, this.deleteConfirmation);
+				}
+				return msg;
 			}
 
 			return Promise.reject("Channel is not a text channel");
