@@ -15,4 +15,7 @@ export const TYPES = {
 
 	// Delete command options
 	DeleteConfirmation: Symbol("DeleteConfirmation"),
+
+	// Quote command options
+	QuoteChannel: Symbol("QuoteChannel"),
 };

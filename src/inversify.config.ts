@@ -9,6 +9,7 @@ import {CommandHandler} from "./services/CommandHandler";
 import {Sarcasm} from "./commands/Sarcasm";
 import {ICommand} from "./commands/ICommand";
 import {Delete} from "./commands/Delete";
+import {Quote} from "./commands/Quote";
 
 dotenv.config();
 const container = new Container();
@@ -35,6 +36,7 @@ container.bind<CommandHandler>(TYPES.CommandHandler).to(CommandHandler).inSingle
 container.bind<string>(TYPES.Prefix).toConstantValue(process.env.PREFIX);
 container.bind<ICommand>(TYPES.Commands).to(Sarcasm);
 container.bind<ICommand>(TYPES.Commands).to(Delete);
+container.bind<ICommand>(TYPES.Commands).to(Quote);
 
 // RoleStealer service options
 container.bind<string[]>(TYPES.StealableRoles).toConstantValue(process.env.STEALABLE_ROLES.split(","));
@@ -43,5 +45,8 @@ container.bind<string[]>(TYPES.StealableRoles).toConstantValue(process.env.STEAL
 container
 	.bind<number>(TYPES.DeleteConfirmation)
 	.toConstantValue(parseInt(process.env.DELETE_CONFIRMATION, 10));
+
+// Quote command options
+container.bind<string>(TYPES.QuoteChannel).toConstantValue(process.env.QUOTE_CHANNEL);
 
 export default container;

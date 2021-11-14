@@ -8,6 +8,7 @@
 	"scripts": {
 		"start": "node dist/index.js",
 		"watch": "tsc -p tsconfig.json -w",
+		"build": "tsc -p tsconfig.json",
 		"dev": "DEBUG='bot*' nodemon dist/index.js",
 		"prettier": "prettier --write ."
 	},
