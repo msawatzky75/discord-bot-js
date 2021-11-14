@@ -13,11 +13,19 @@ export class Logger {
 		}
 	}
 
-	public log(message: string): void {
-		this._log(message);
+	public verbose(message: string): void {
+		this._log(message, "verbose");
 	}
 
-	public error(error: Error): void {
-		this._log(`${error.name} - ${error.message}`, "error");
+	public log(message: string): void {
+		this._log(message, "info");
+	}
+
+	public error(error: string): void {
+		this._log(error, "error");
+	}
+
+	public debug(message: string): void {
+		this._log(message, "debug");
 	}
 }

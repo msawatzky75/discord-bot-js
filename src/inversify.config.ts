@@ -5,6 +5,9 @@ import {Bot} from "./bot";
 import {Client, Intents} from "discord.js";
 import {RoleStealer} from "./services/RoleStealer";
 import {Logger} from "./logger";
+import {CommandHandler} from "./services/CommandHandler";
+import {Sarcasm} from "./commands/Sarcasm";
+import {ICommand} from "./commands/ICommand";
 
 dotenv.config();
 const container = new Container();
@@ -22,7 +25,14 @@ container.bind<Client>(TYPES.Client).toConstantValue(
 );
 container.bind<string>(TYPES.Token).toConstantValue(process.env.DISCORD_TOKEN);
 container.bind<Logger>(TYPES.Logger).to(Logger).inSingletonScope();
+
+// Services
 container.bind<RoleStealer>(TYPES.RoleStealer).to(RoleStealer).inSingletonScope();
 container.bind<string[]>(TYPES.StealableRoles).toConstantValue(process.env.STEALABLE_ROLES.split(","));
+container.bind<CommandHandler>(TYPES.CommandHandler).to(CommandHandler).inSingletonScope();
+
+// Commands
+container.bind<string>(TYPES.Prefix).toConstantValue(process.env.PREFIX);
+container.bind<ICommand>(TYPES.Commands).to(Sarcasm);
 
 export default container;

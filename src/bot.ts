@@ -4,39 +4,41 @@ import {inject, injectable} from "inversify";
 import {TYPES} from "./types";
 import {Logger} from "./logger";
 import {RoleStealer} from "./services/RoleStealer";
+import {CommandHandler} from "./services/CommandHandler";
 @injectable()
 export class Bot {
-	private client: Client;
-	private token: string;
-	private logger: Logger;
-	private roleStealer: RoleStealer;
-
-	constructor(
-		@inject(TYPES.Client) client: Client,
-		@inject(TYPES.Token) token: string,
-		@inject(TYPES.RoleStealer) roleStealer: RoleStealer,
-		@inject(TYPES.Logger) logger: Logger,
-	) {
-		this.client = client;
-		this.token = token;
-		this.logger = logger;
-		this.roleStealer = roleStealer;
-	}
+	@inject(TYPES.Client) private client: Client;
+	@inject(TYPES.Token) private token: string;
+	@inject(TYPES.Logger) private logger: Logger;
+	// services
+	@inject(TYPES.RoleStealer) private roleStealer: RoleStealer;
+	@inject(TYPES.CommandHandler) private commandHandler: CommandHandler;
 
 	listen(): Promise<string> {
 		this.client.on("messageCreate", (message: Message) => {
 			if (message.author.bot) {
-				this.logger.log("Ignoring bot message");
+				this.logger.verbose("Ignoring bot message");
 				return;
 			}
-			this.logger.log(`Handling message: ${message.content}`);
+			this.logger.verbose(`Handling message: ${message.content}`);
+
+			this.commandHandler
+				.handle(message)
+				.then(() => {
+					this.logger.verbose(`Handled message: ${message.content}`);
+				})
+				.catch((e?: string) => {
+					if (e) {
+						this.logger.error(e);
+					}
+				});
 
 			this.roleStealer
 				.handle(message)
 				.then(() => {
-					this.logger.log("Message handled");
+					this.logger.verbose("Message handled");
 				})
-				.catch((e?: Error) => {
+				.catch((e?: string) => {
 					if (e) {
 						this.logger.error(e);
 					}
