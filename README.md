@@ -1,11 +1,11 @@
-Marty Bot
-=========
+# Marty Bot
 
 ## Getting Started
 
 Marty bot is built into docker containers and can be found at [Docker Hub](https://cloud.docker.com/repository/docker/msawatzky75/discord-bot-js).
 
 ### Installation
+
 1. Clone this repository.
 1. Install NodeJS.
 1. [Install Yarn.](https://yarnpkg.com/lang/en/docs/install/)
@@ -24,14 +24,17 @@ Run `docker build -t msawatzky75/discord-bot-js .` to build and tag as latest.
 If you just want a local copy of the build, see `yarn build` below. Alternatively, if you didn't want it bundled, you can just run `tsc`.
 
 ### Running the Bot
+
 1. Run `docker-compose up` in the project folder.
 
 #### OR
+
 1. Start your postgres database, with credentials that match the [.env](.env.default) file
 1. Run `yarn db` (only needed the first time you run).
 1. Run `yarn dev` or `yarn start` to start the bot.
 
 ### Available Commands
+
 - `yarn build` will build and bundle the typescript into js in `dist/bundle.js` file.
 - `yarn dev` will run a development version that will restart on file changes.
 - `yarn lint` will lint the code without making changes.
@@ -39,21 +42,22 @@ If you just want a local copy of the build, see `yarn build` below. Alternativel
 - `yarn test` will run the test suite.
 
 ### Code Structure
+
 Every command must export a function as an interface for the command. Available arguments are the message object, the user object, and an array of arguments from the message.
 
 Each command should be exported from the [index](commands/index.ts) in the commands folder. Anything else needed will be referenced directly to the file.
 Each command file should also export a `help` method that returns a RichEmbed object detailing usage for the user to see.
 
-
 ## Bot Commands
 
 ### Config
+
 Used to configure settings as needed.
 
 Usage: `!config [action] [property] [value]`
 
-
 #### Actions
+
 - Set - used to set a new property.
 - Update - used to update an existing property.
 - Remove - used to unset a property.
@@ -61,6 +65,7 @@ Usage: `!config [action] [property] [value]`
 #### Properties
 
 ##### timezone
+
 Used by the `remind` command to inform you of the correct time it will remind you. For a list of available values, refer to [moment-timezone](https://momentjs.com/timezone/docs/)
 
 ### Count
@@ -69,32 +74,32 @@ Used to see how many of what command you have sent.
 
 Usage: `!count [command_name | all | invalid]`
 
-
 ### Help
+
 Used to list the help for a command.
 
 Usage: `!help [command_name]`
 
 NOTE: This command will fail if your command file does not export a `help => RichEmbed` method.
 
-
 ### Nickname
+
 Used to set nicknames of other guild members.
 
 Usage: `!nickname [@user] [text under 32 characters]`
 
-NOTE: The manage nicknames permission is required for this command to work. 
+NOTE: The manage nicknames permission is required for this command to work.
 The command will also fail if you are trying to change the nick name of a member that has a superior role, or is the owner of the server.
 
-
 ### Remind
+
 Used to remind a user of something at the time specified.
 After a reminder has been set, Marty will message the user of the time and message immediately and at the requested time.
 
 Usage: `!remind 1 hour cook dinner`
 
-
 ### Sarcasm
+
 Capitalizes every other letter of text provided.
 
 Usage: `!sarcasm [any text]`
