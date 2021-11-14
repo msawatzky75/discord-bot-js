@@ -13,7 +13,7 @@
 	"rules": {
 		"semi": "error",
 		"max-lines": ["warn", {"max": 300, "skipBlankLines": true, "skipComments": true}],
-		"indent": ["error", "tab", {"SwitchCase": 1}],
+		"indent": ["error", "tab", {"SwitchCase": 1, "FunctionDeclaration": "first"}],
 		"no-tabs": "off",
 		"arrow-parens": ["error", "as-needed"],
 		"comma-dangle": ["error", "always-multiline"],
@@ -34,7 +34,7 @@
 		"max-statements": ["warn", {"max": 100}],
 		"no-plusplus": "off",
 		"no-unused-vars": ["error", {"varsIgnorePattern": "d"}],
-		"quotes": ["error", "single"],
+		"quotes": ["error", "double"],
 
 		// Typescript
 		"@typescript-eslint/indent": ["error", "tab", {"SwitchCase": 1}],
