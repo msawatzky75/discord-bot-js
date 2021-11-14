@@ -11,7 +11,6 @@ export class Sarcasm implements ICommand {
 	@inject(TYPES.Logger) private logger: Logger;
 
 	public canHandle(message: Message, prefix: string): boolean {
-		this.logger.debug(`Checking if ${message.content} can be handled by ${this.name}`);
 		return message.content.startsWith(prefix + this.name);
 	}
 

@@ -12,4 +12,7 @@ export const TYPES = {
 	CommandHandler: Symbol("CommandHandler"),
 	Commands: Symbol("Commands"),
 	Prefix: Symbol("Prefix"),
+
+	// Delete command options
+	DeleteConfirmation: Symbol("DeleteConfirmation"),
 };

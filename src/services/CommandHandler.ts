@@ -21,13 +21,16 @@ export class CommandHandler {
 			return this.help(message);
 		}
 
-		const promise = this.commands.reduce<Promise<Message | Message[]> | undefined>((promise, command: ICommand) => {
-			if (command.canHandle(message, this.prefix)) {
-				this.logger.log(`Handling command: ${command.name}`);
-				return command.handle(message, this.prefix);
-			}
-			return promise;
-		}, undefined);
+		const promise = this.commands.reduce<Promise<Message | Message[]> | undefined>(
+			(promise, command: ICommand) => {
+				if (command.canHandle(message, this.prefix)) {
+					this.logger.log(`CommandHandler handling command: ${command.name}`);
+					return command.handle(message, this.prefix);
+				}
+				return promise;
+			},
+			undefined,
+		);
 
 		if (promise) {
 			return promise;
