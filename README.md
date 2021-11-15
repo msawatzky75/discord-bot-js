@@ -1,105 +1,60 @@
 # Marty Bot
 
-## Getting Started
+## Setup
 
-Marty bot is built into docker containers and can be found at [Docker Hub](https://cloud.docker.com/repository/docker/msawatzky75/discord-bot-js).
+Requirements: [Yarn](https://yarnpkg.com/lang/en/docs/install/), Node (v16)
+OR [Docker](https://docs.docker.com/get-docker/), [Docker Compose](https://docs.docker.com/compose/install/)
 
-### Installation
+This project uses [zero-install yarn](https://yarnpkg.com/features/zero-installs), meaning you do
+not have to run a separate install step. All the dependancies are already there.
 
 1. Clone this repository.
-1. Install NodeJS.
-1. [Install Yarn.](https://yarnpkg.com/lang/en/docs/install/)
-1. Install Docker. (optional, see below)
-1. Install Docker Compose. (optional, see below)
-1. Copy and rename the [.env.default](.env.default) file to `.env` and add your bot token.
-1. Run `yarn install` in the project folder.
 
-Note: Docker is optional, but you will need to setup your own postgres server with a database that matches your connection string (configured in [.env](.env)).
-That being said, using Docker is the easiest approach, though not ideal for development.
+1. Create your environment by copying the [.env.default](.env.default) file to `.env`
+   and add your token and configuraton
 
-### Building the Bot
+   ```
+   $ cp .env.default .env
+   ```
 
-Run `docker build -t msawatzky75/discord-bot-js .` to build and tag as latest.
+1. Build the bot using this command:
 
-If you just want a local copy of the build, see `yarn build` below. Alternatively, if you didn't want it bundled, you can just run `tsc`.
+   ```
+   $ yarn build
+   ```
 
-### Running the Bot
+1. You're done! You can run the bot with
 
-1. Run `docker-compose up` in the project folder.
+   ```
+   $ yarn start
+   ```
 
-#### OR
+## Development
 
-1. Start your postgres database, with credentials that match the [.env](.env.default) file
-1. Run `yarn db` (only needed the first time you run).
-1. Run `yarn dev` or `yarn start` to start the bot.
+There are some commands to help you develop the bot:
 
-### Available Commands
+1. To rebuild the bot every time you save a file:
 
-- `yarn build` will build and bundle the typescript into js in `dist/bundle.js` file.
-- `yarn dev` will run a development version that will restart on file changes.
-- `yarn lint` will lint the code without making changes.
-- `yarn start` will run a production version of the bot.
-- `yarn test` will run the test suite.
+   ```
+   $ yarn watch
+   ```
 
-### Code Structure
+1. To start the development server, and restart it every time you save a file:
 
-Every command must export a function as an interface for the command. Available arguments are the message object, the user object, and an array of arguments from the message.
+   ```
+   $ yarn dev
+   ```
 
-Each command should be exported from the [index](commands/index.ts) in the commands folder. Anything else needed will be referenced directly to the file.
-Each command file should also export a `help` method that returns a RichEmbed object detailing usage for the user to see.
+## Code Structure
 
-## Bot Commands
+The only thing this bot can do is run a service for each message that gets sent.
+These are defined in the [services](src/services) folder.
+But this does not mean the bot handle commands.
 
-### Config
+The [CommandHandler](src/services/CommandHandler) is the command service, which watches for command-like messages. See [commands](src/commands/README.md) for the commands that are available and how to structure new ones.
 
-Used to configure settings as needed.
+## Dependency Injection
 
-Usage: `!config [action] [property] [value]`
+All configuration is done through dependency injection.
 
-#### Actions
-
-- Set - used to set a new property.
-- Update - used to update an existing property.
-- Remove - used to unset a property.
-
-#### Properties
-
-##### timezone
-
-Used by the `remind` command to inform you of the correct time it will remind you. For a list of available values, refer to [moment-timezone](https://momentjs.com/timezone/docs/)
-
-### Count
-
-Used to see how many of what command you have sent.
-
-Usage: `!count [command_name | all | invalid]`
-
-### Help
-
-Used to list the help for a command.
-
-Usage: `!help [command_name]`
-
-NOTE: This command will fail if your command file does not export a `help => RichEmbed` method.
-
-### Nickname
-
-Used to set nicknames of other guild members.
-
-Usage: `!nickname [@user] [text under 32 characters]`
-
-NOTE: The manage nicknames permission is required for this command to work.
-The command will also fail if you are trying to change the nick name of a member that has a superior role, or is the owner of the server.
-
-### Remind
-
-Used to remind a user of something at the time specified.
-After a reminder has been set, Marty will message the user of the time and message immediately and at the requested time.
-
-Usage: `!remind 1 hour cook dinner`
-
-### Sarcasm
-
-Capitalizes every other letter of text provided.
-
-Usage: `!sarcasm [any text]`
+Define your dependencies in [inversify.config.ts](inversify.config.ts) file, and inject your dependencies into where you need them.

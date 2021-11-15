@@ -37,7 +37,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@types/debug", "npm:4.1.7"],
             ["@types/dotenv", "npm:6.1.1"],
-            ["@types/lodash", "npm:4.14.176"],
             ["@types/node", "npm:16.11.7"],
             ["@typescript-eslint/eslint-plugin", "virtual:b88d348178427fd7c2f1b73b522fa1ad47a441ca74ffd4f5e03c79de6435cf5e19682d611bf2b693e0435fb46342d079433bbaa38e995d4a88b91cf36b24e6fc#npm:5.3.1"],
             ["@typescript-eslint/parser", "virtual:b88d348178427fd7c2f1b73b522fa1ad47a441ca74ffd4f5e03c79de6435cf5e19682d611bf2b693e0435fb46342d079433bbaa38e995d4a88b91cf36b24e6fc#npm:5.3.1"],
@@ -48,7 +47,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-config-prettier", "virtual:b88d348178427fd7c2f1b73b522fa1ad47a441ca74ffd4f5e03c79de6435cf5e19682d611bf2b693e0435fb46342d079433bbaa38e995d4a88b91cf36b24e6fc#npm:8.3.0"],
             ["eslint-plugin-import", "virtual:b88d348178427fd7c2f1b73b522fa1ad47a441ca74ffd4f5e03c79de6435cf5e19682d611bf2b693e0435fb46342d079433bbaa38e995d4a88b91cf36b24e6fc#npm:2.25.3"],
             ["inversify", "npm:6.0.1"],
-            ["lodash", "npm:4.17.21"],
             ["moment", "npm:2.29.1"],
             ["moment-timezone", "npm:0.5.34"],
             ["nodemon", "npm:2.0.15"],
@@ -352,15 +350,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@types/keyv", "npm:3.1.3"],
             ["@types/node", "npm:12.0.4"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["@types/lodash", [
-        ["npm:4.14.176", {
-          "packageLocation": "./.yarn/cache/@types-lodash-npm-4.14.176-34dca4acb8-9e949704df.zip/node_modules/@types/lodash/",
-          "packageDependencies": [
-            ["@types/lodash", "npm:4.14.176"]
           ],
           "linkType": "HARD",
         }]
@@ -1544,7 +1533,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["discord-bot-js", "workspace:."],
             ["@types/debug", "npm:4.1.7"],
             ["@types/dotenv", "npm:6.1.1"],
-            ["@types/lodash", "npm:4.14.176"],
             ["@types/node", "npm:16.11.7"],
             ["@typescript-eslint/eslint-plugin", "virtual:b88d348178427fd7c2f1b73b522fa1ad47a441ca74ffd4f5e03c79de6435cf5e19682d611bf2b693e0435fb46342d079433bbaa38e995d4a88b91cf36b24e6fc#npm:5.3.1"],
             ["@typescript-eslint/parser", "virtual:b88d348178427fd7c2f1b73b522fa1ad47a441ca74ffd4f5e03c79de6435cf5e19682d611bf2b693e0435fb46342d079433bbaa38e995d4a88b91cf36b24e6fc#npm:5.3.1"],
@@ -1555,7 +1543,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-config-prettier", "virtual:b88d348178427fd7c2f1b73b522fa1ad47a441ca74ffd4f5e03c79de6435cf5e19682d611bf2b693e0435fb46342d079433bbaa38e995d4a88b91cf36b24e6fc#npm:8.3.0"],
             ["eslint-plugin-import", "virtual:b88d348178427fd7c2f1b73b522fa1ad47a441ca74ffd4f5e03c79de6435cf5e19682d611bf2b693e0435fb46342d079433bbaa38e995d4a88b91cf36b24e6fc#npm:2.25.3"],
             ["inversify", "npm:6.0.1"],
-            ["lodash", "npm:4.17.21"],
             ["moment", "npm:2.29.1"],
             ["moment-timezone", "npm:0.5.34"],
             ["nodemon", "npm:2.0.15"],
@@ -3237,15 +3224,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["locate-path", "npm:2.0.0"],
             ["p-locate", "npm:2.0.0"],
             ["path-exists", "npm:3.0.0"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["lodash", [
-        ["npm:4.17.21", {
-          "packageLocation": "./.yarn/cache/lodash-npm-4.17.21-6382451519-eb835a2e51.zip/node_modules/lodash/",
-          "packageDependencies": [
-            ["lodash", "npm:4.17.21"]
           ],
           "linkType": "HARD",
         }]

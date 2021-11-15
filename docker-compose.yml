@@ -1,24 +1,11 @@
-version: "2"
+version: "3"
 services:
-  app:
-    image: msawatzky75/discord-bot-js
+  bot:
+    container_name: bot
+    build: .
     restart: always
-    environment:
-      PREFIX: ${PREFIX}
-      TOKEN: ${TOKEN}
-      DATABASE_URL: postgres://postgres:${DB_PASSWORD}@discord_bot_database:5432/${DB_NAME}
-    depends_on:
-      - db
-
-  db:
-    container_name: discord_bot_database
-    image: postgres
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    ports:
-      - 5432:5432
+    env_file:
+      - .env
     volumes:
       - data:/var/lib/db
 
