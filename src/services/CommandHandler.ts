@@ -1,4 +1,4 @@
-import {Message} from "discord.js";
+import {Message, Snowflake} from "discord.js";
 import {inject, injectable, multiInject} from "inversify";
 import {TYPES} from "../types";
 import {ICommand} from "../commands/ICommand";
@@ -9,11 +9,17 @@ export class CommandHandler {
 	@multiInject(TYPES.Commands) public commands: ICommand[];
 	@inject(TYPES.Prefix) private prefix: string;
 	@inject(TYPES.Logger) private logger: Logger;
+	@inject(TYPES.CommandChannelWhitelist) private commandChannelWhitelist: Snowflake[];
 
 	handle(message: Message): Promise<Message | Message[]> {
 		if (!message.content.startsWith(this.prefix)) {
 			// its just a normal message
 			this.logger.verbose(`Message does not start with prefix: ${message.content}`);
+			return Promise.reject();
+		}
+
+		if (!this.commandChannelWhitelist.includes(message.channel.id)) {
+			this.logger.verbose(`Message is not in a whitelisted channel: ${message.content}`);
 			return Promise.reject();
 		}
 

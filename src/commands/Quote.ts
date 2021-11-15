@@ -24,7 +24,7 @@ export class Quote implements ICommand {
 			const messages = await quoteChannel.messages.fetch({limit: 100});
 
 			const randomMessage = messages.random();
-			return message.reply(randomMessage.content);
+			return message.reply(`\`${randomMessage.content}\``);
 		}
 
 		return Promise.reject("Could not find quote channel");

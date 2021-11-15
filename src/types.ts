@@ -12,6 +12,7 @@ export const TYPES = {
 	CommandHandler: Symbol("CommandHandler"),
 	Commands: Symbol("Commands"),
 	Prefix: Symbol("Prefix"),
+	CommandChannelWhitelist: Symbol("CommandChannelWhitelist"),
 
 	// Delete command options
 	DeleteConfirmation: Symbol("DeleteConfirmation"),

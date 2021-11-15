@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import {Container} from "inversify";
 import {TYPES} from "./types";
 import {Bot} from "./bot";
-import {Client, Intents} from "discord.js";
+import {Client, Intents, Snowflake} from "discord.js";
 import {RoleStealer} from "./services/RoleStealer";
 import {Logger} from "./logger";
 import {CommandHandler} from "./services/CommandHandler";
@@ -33,6 +33,9 @@ container.bind<RoleStealer>(TYPES.RoleStealer).to(RoleStealer).inSingletonScope(
 container.bind<CommandHandler>(TYPES.CommandHandler).to(CommandHandler).inSingletonScope();
 
 // Commands
+container
+	.bind<Snowflake[]>(TYPES.CommandChannelWhitelist)
+	.toConstantValue(process.env.COMMAND_CHANNEL_WHITELIST.split(","));
 container.bind<string>(TYPES.Prefix).toConstantValue(process.env.PREFIX);
 container.bind<ICommand>(TYPES.Commands).to(Sarcasm);
 container.bind<ICommand>(TYPES.Commands).to(Delete);
