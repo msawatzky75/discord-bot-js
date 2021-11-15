@@ -29,6 +29,21 @@ not have to run a separate install step. All the dependancies are already there.
    $ yarn start
    ```
 
+### Using Docker
+
+If you choose to use docker to run the bot, you can use the following commands:
+
+```
+$ docker-compose up --build
+```
+
+or if you dont want to use docker-compose:
+
+```
+$ docker build . --tag marty-bot:latest
+$ docker run marty-bot:latest
+```
+
 ## Development
 
 There are some commands to help you develop the bot:
