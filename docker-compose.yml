@@ -1,6 +1,7 @@
 version: "3"
 services:
   bot:
+    container_name: bot
     build: .
     restart: always
     env_file:
