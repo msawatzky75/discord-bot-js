@@ -9,9 +9,10 @@ export class Sarcasm implements ICommand {
 	public name = "sarcasm";
 	public description = "converts message into alternating-caps";
 	@inject(TYPES.Logger) private logger: Logger;
+	@inject(TYPES.Prefix) private prefix: string;
 
-	public canHandle(message: Message, prefix: string): boolean {
-		return message.content.startsWith(prefix + this.name);
+	public canHandle(message: Message): boolean {
+		return message.content.startsWith(this.prefix + this.name);
 	}
 
 	public handle(message: Message): Promise<Message | Message[]> {

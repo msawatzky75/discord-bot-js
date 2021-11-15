@@ -29,9 +29,9 @@ export class CommandHandler {
 
 		const promise = this.commands.reduce<Promise<Message | Message[]> | undefined>(
 			(promise, command: ICommand) => {
-				if (command.canHandle(message, this.prefix)) {
+				if (command.canHandle(message)) {
 					this.logger.log(`CommandHandler handling command: ${command.name}`);
-					return command.handle(message, this.prefix);
+					return command.handle(message);
 				}
 				return promise;
 			},

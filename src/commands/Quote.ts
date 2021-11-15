@@ -11,9 +11,10 @@ export class Quote implements ICommand {
 	public aliases = ["q"];
 	@inject(TYPES.QuoteChannel) private quoteChannel: Snowflake;
 	@inject(TYPES.Logger) private logger: Logger;
+	@inject(TYPES.Prefix) private prefix: string;
 
-	public canHandle(message: Message, prefix: string): boolean {
-		return message.content.startsWith(prefix + this.name);
+	public canHandle(message: Message): boolean {
+		return message.content.startsWith(this.prefix + this.name);
 	}
 
 	public async handle(message: Message): Promise<Message | Message[]> {

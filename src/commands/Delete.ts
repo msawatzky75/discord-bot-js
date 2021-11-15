@@ -12,13 +12,14 @@ export class Delete implements ICommand {
 	public usage = "delete <number of messages to be deleted>";
 	@inject(TYPES.Logger) private logger: Logger;
 	@inject(TYPES.DeleteConfirmation) private deleteConfirmation: number;
+	@inject(TYPES.Prefix) private prefix: string;
 
-	public canHandle(message: Message, prefix: string): boolean {
-		return this.getEndOfCommandIndex(message, prefix) !== -1;
+	public canHandle(message: Message): boolean {
+		return this.getEndOfCommandIndex(message, this.prefix) !== -1;
 	}
 
-	public async handle(message: Message, prefix: string): Promise<Message | Message[]> {
-		const args = message.content.substring(this.getEndOfCommandIndex(message, prefix)).trim().split(" ");
+	public async handle(message: Message): Promise<Message | Message[]> {
+		const args = message.content.substring(this.getEndOfCommandIndex(message, this.prefix)).trim().split(" ");
 
 		if (args.length > 0) {
 			// check if the first argument is a number
