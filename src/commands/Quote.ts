@@ -23,9 +23,22 @@ export class Quote implements ICommand {
 
 		if (quoteChannel instanceof TextChannel) {
 			const messages = await quoteChannel.messages.fetch({limit: 100});
-
 			const randomMessage = messages.random();
-			return message.reply(`\`${randomMessage.content}\``);
+
+			await Promise.all(randomMessage.mentions.users.map((user) => message.guild.members.fetch(user.id)));
+
+			// replace mentions with their names
+			const content = randomMessage.content.replace(/<@!?(\d+)>/g, (match) => {
+				const id = match.replace(/<@!?/, "").replace(/>/, "");
+				const member = message.guild.members.cache.get(id);
+				this.logger.debug(`Replacing mention: ${id}`);
+				if (member) {
+					return member.displayName;
+				}
+				return "'You're too good for a name'";
+			});
+
+			return message.reply(content);
 		}
 
 		return Promise.reject("Could not find quote channel");
