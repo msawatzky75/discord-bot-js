@@ -38,7 +38,8 @@ container
 	.toConstantValue(process.env.COMMAND_CHANNEL_WHITELIST.split(","));
 container.bind<string>(TYPES.Prefix).toConstantValue(process.env.PREFIX);
 container.bind<ICommand>(TYPES.Commands).to(Sarcasm);
-container.bind<ICommand>(TYPES.Commands).to(Delete);
+// disabled for now
+// container.bind<ICommand>(TYPES.Commands).to(Delete);
 container.bind<ICommand>(TYPES.Commands).to(Quote);
 
 // RoleStealer service options
