@@ -33,7 +33,7 @@ export class Quote implements ICommand {
 				const member = message.guild.members.cache.get(id);
 				this.logger.debug(`Replacing mention: ${id}`);
 				if (member) {
-					return member.displayName.trim();
+					return `**${member.displayName.trim()}**`;
 				}
 				return "'You're too good for a name'";
 			});
