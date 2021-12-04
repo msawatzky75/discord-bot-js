@@ -7,22 +7,21 @@ on:
     branches: [master]
 
 stages:
-  - build
-  - deploy
+  - stage: build
+    jobs:
+      - job: build
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v2
+          - name: Build the Docker image
+            run: docker build . -t msawatzky75/marty:nightly
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    stage: build
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build the Docker image
-        run: docker build . -t msawatzky75/marty:nightly
-
-  push:
-    runs-on: ubuntu-latest
-    stage: deploy
-    steps:
-      - uses: actions/checkout@v2
-      - name: Push the Docker image
-        run: docker push msawatzky75/marty:nightly
+  - stage: deploy
+    jobs:
+      - job: push
+        runs-on: ubuntu-latest
+        stage: deploy
+        steps:
+          - uses: actions/checkout@v2
+          - name: Push the Docker image
+            run: docker push msawatzky75/marty:nightly
