@@ -13,4 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build the Docker image
-        run: docker build .
+        run: docker build . -t msawatzky75/marty:nightly
+
+  push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Push the Docker image
+        run: docker push msawatzky75/marty:nightly
