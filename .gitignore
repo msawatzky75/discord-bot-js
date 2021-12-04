@@ -11,3 +11,5 @@ dist/
 
 .env*
 !.env.default
+
+database.sqlite

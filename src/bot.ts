@@ -14,7 +14,7 @@ export class Bot {
 	@inject(TYPES.RoleStealer) private roleStealer: RoleStealer;
 	@inject(TYPES.CommandHandler) private commandHandler: CommandHandler;
 
-	listen(): Promise<string> {
+	listen() {
 		this.client.on("messageCreate", (message: Message) => {
 			if (message.author.bot) {
 				this.logger.verbose("Ignoring bot message");
@@ -48,6 +48,7 @@ export class Bot {
 		this.client.on("ready", () => {
 			this.logger.log(`Logged in as ${this.client.user.tag}!`);
 		});
+
 		return this.client.login(this.token);
 	}
 }

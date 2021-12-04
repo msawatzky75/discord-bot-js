@@ -1,5 +1,6 @@
 export const TYPES = {
 	Bot: Symbol("Bot"),
+	DatabaseProvider: Symbol("DatabaseProvider"),
 	Client: Symbol("Client"),
 	Token: Symbol("Token"),
 	Logger: Symbol("Logger"),
@@ -19,4 +20,6 @@ export const TYPES = {
 
 	// Quote command options
 	QuoteChannel: Symbol("QuoteChannel"),
+
+	GuildConfig: Symbol("GuildConfig"),
 };
