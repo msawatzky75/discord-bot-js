@@ -1,5 +1,5 @@
 # Marty Bot
-
+[![Marty Nightly](https://github.com/msawatzky75/discord-bot-js/actions/workflows/docker-image.yml/badge.svg?branch=master)](https://github.com/msawatzky75/discord-bot-js/actions/workflows/docker-image.yml)
 ## Setup
 
 Requirements: [Yarn](https://yarnpkg.com/lang/en/docs/install/), Node (v16)
