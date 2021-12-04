@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master]
 
+stages:
+  - build
+  - deploy
+
 jobs:
   build:
     runs-on: ubuntu-latest
