@@ -6,22 +6,14 @@ on:
   pull_request:
     branches: [master]
 
-stages:
-  - stage: build
-    jobs:
-      build:
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v2
-          - name: Build the Docker image
-            run: docker build . -t msawatzky75/marty:nightly
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
-  - stage: deploy
-    jobs:
-      push:
-        runs-on: ubuntu-latest
-        stage: deploy
-        steps:
-          - uses: actions/checkout@v2
-          - name: Push the Docker image
-            run: docker push msawatzky75/marty:nightly
+      - name: Build the Docker image
+        run: docker build . -t msawatzky75/marty:nightly
+
+      - name: Push the Docker image
+        run: docker push msawatzky75/marty:nightly
