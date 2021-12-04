@@ -15,5 +15,8 @@ jobs:
       - name: Build the Docker image
         run: docker build . -t msawatzky75/marty:nightly
 
+      - name: Login to docker
+        run: docker login -u msawatzky75 -p $DOCKER_ACCESS_TOKEN
+
       - name: Push the Docker image
         run: docker push msawatzky75/marty:nightly
