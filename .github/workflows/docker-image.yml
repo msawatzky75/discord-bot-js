@@ -16,7 +16,6 @@ jobs:
         run: docker build . -t msawatzky75/marty:nightly
 
       - name: Login to docker
-        uses: docker/login-action@v2
         run: docker login -u msawatzky75 -p ${{secrets.DOCKER_ACCESS_TOKEN}}
 
       - name: Push the Docker image
