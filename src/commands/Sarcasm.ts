@@ -1,18 +1,17 @@
 import {Message} from "discord.js";
-import {inject, injectable} from "inversify";
-import {Logger} from "../logger";
-import {TYPES} from "../types";
+import {injectable} from "inversify";
+import {Command} from "./Command";
 import {ICommand} from "./ICommand";
 
 @injectable()
-export class Sarcasm implements ICommand {
+export class Sarcasm extends Command implements ICommand {
 	public name = "sarcasm";
 	public description = "converts message into alternating-caps";
-	@inject(TYPES.Logger) private logger: Logger;
-	@inject(TYPES.Prefix) private prefix: string;
+	public usage = "sarcasm <message>";
+	public aliases: string[] = ["s"];
 
 	public canHandle(message: Message): boolean {
-		return message.content.startsWith(this.prefix + this.name);
+		return this.getEndOfCommandIndex(message, this.prefix) !== -1;
 	}
 
 	public handle(message: Message): Promise<Message | Message[]> {

@@ -12,4 +12,15 @@ export class GuildConfig extends BaseEntity {
 
 	@Column({type: "varchar", nullable: true})
 	prefix: string;
+
+	public static async findOneOrCreate(guildId: string) {
+		const config = await this.findOne({guildId});
+		if (config) {
+			return config;
+		}
+		const newConfig = new this();
+		newConfig.guildId = guildId;
+		await this.save(newConfig);
+		return newConfig;
+	}
 }

@@ -24,25 +24,13 @@ export class Bot {
 
 			this.commandHandler
 				.handle(message)
-				.then(() => {
-					this.logger.verbose(`Handled message: ${message.content}`);
-				})
-				.catch((e?: string) => {
-					if (e) {
-						this.logger.error(e);
-					}
-				});
+				.then(() => this.logger.verbose(`Handled message: ${message.content}`))
+				.catch((e?: Error) => e && this.logger.error(e));
 
 			this.roleStealer
 				.handle(message)
-				.then(() => {
-					this.logger.verbose("Message handled");
-				})
-				.catch((e?: string) => {
-					if (e) {
-						this.logger.error(e);
-					}
-				});
+				.then(() => this.logger.verbose("Message handled"))
+				.catch((e?: Error) => e && this.logger.error(e));
 		});
 
 		this.client.on("ready", () => {

@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import {Container} from "inversify";
+import {Container, decorate, injectable} from "inversify";
 import {TYPES} from "./types";
 import {Bot} from "./bot";
 import {Client, Intents, Snowflake} from "discord.js";
@@ -10,27 +10,28 @@ import {Sarcasm} from "./commands/Sarcasm";
 import {ICommand} from "./commands/ICommand";
 import {Delete} from "./commands/Delete";
 import {Quote} from "./commands/Quote";
-import {Connection, createConnection} from "typeorm";
+import {createConnection, Repository} from "typeorm";
 import {GuildConfigRepository} from "./repositories/GuildConfig";
 import {Config} from "./commands/Config";
 import {GuildConfig} from "./entities/GuildConfig";
+import {GuildWhitelistRepository} from "./repositories/GuildWhitelist";
+import {GuildWhitelist} from "./entities/GuildWhitelist";
 
 dotenv.config();
+
+decorate(injectable(), Repository);
+createConnection({
+	type: "sqlite",
+	database: "./database.sqlite",
+	synchronize: true,
+	logging: false,
+	entities: [GuildConfig, GuildWhitelist],
+});
 
 const container = new Container();
 
 container.bind<Bot>(TYPES.Bot).to(Bot).inSingletonScope();
-container.bind<typeof createConnection>(TYPES.DatabaseProvider).toProvider<Connection>((context) => {
-	return () => {
-		return createConnection({
-			type: "sqlite",
-			database: "./database.sqlite",
-			synchronize: true,
-			logging: false,
-			entities: [GuildConfig],
-		});
-	};
-});
+
 container.bind<Client>(TYPES.Client).toConstantValue(
 	new Client({
 		intents: [
@@ -72,5 +73,9 @@ container
 container.bind<string>(TYPES.QuoteChannel).toConstantValue(process.env.QUOTE_CHANNEL);
 
 container.bind<GuildConfigRepository>(TYPES.GuildConfig).to(GuildConfigRepository).inSingletonScope();
+container
+	.bind<GuildWhitelistRepository>(TYPES.GuildWhitelist)
+	.to(GuildWhitelistRepository)
+	.inSingletonScope();
 
 export default container;
