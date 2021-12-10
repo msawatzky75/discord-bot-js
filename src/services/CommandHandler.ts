@@ -8,8 +8,11 @@ import {Logger} from "../logger";
 export class CommandHandler {
 	@multiInject(TYPES.Commands) public commands: ICommand[];
 	@inject(TYPES.Prefix) private prefix: string;
-	@inject(TYPES.Logger) private logger: Logger;
 	@inject(TYPES.CommandChannelWhitelist) private commandChannelWhitelist: Snowflake[];
+
+	constructor(@inject(TYPES.Logger) private logger: Logger) {
+		this.logger.context = "service.CommandHandler";
+	}
 
 	handle(message: Message): Promise<Message | Message[]> {
 		if (!message.content.startsWith(this.prefix)) {

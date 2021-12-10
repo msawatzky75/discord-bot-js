@@ -1,4 +1,4 @@
-import {decorate, inject, injectable, interfaces} from "inversify";
+import {decorate, inject, injectable} from "inversify";
 import {Connection, EntityRepository, Repository} from "typeorm";
 import {GuildConfig} from "../entities/GuildConfig";
 import {Logger} from "../logger";

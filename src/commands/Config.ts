@@ -43,7 +43,7 @@ export class Config implements ICommand {
 
 		const guildConfig = await this.guildConfig.findOneOrCreate(message.guild.id);
 		guildConfig.prefix = prefix;
-		this.guildConfig.save(guildConfig);
+		guildConfig.save();
 
 		return message.channel.send("Prefix updated");
 	}

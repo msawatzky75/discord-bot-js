@@ -10,12 +10,13 @@ import {Sarcasm} from "./commands/Sarcasm";
 import {ICommand} from "./commands/ICommand";
 import {Delete} from "./commands/Delete";
 import {Quote} from "./commands/Quote";
-import {Connection, createConnection, Repository} from "typeorm";
+import {Connection, createConnection} from "typeorm";
 import {GuildConfigRepository} from "./repositories/GuildConfig";
 import {Config} from "./commands/Config";
 import {GuildConfig} from "./entities/GuildConfig";
 
 dotenv.config();
+
 const container = new Container();
 
 container.bind<Bot>(TYPES.Bot).to(Bot).inSingletonScope();
@@ -41,7 +42,7 @@ container.bind<Client>(TYPES.Client).toConstantValue(
 	}),
 );
 container.bind<string>(TYPES.Token).toConstantValue(process.env.DISCORD_TOKEN);
-container.bind<Logger>(TYPES.Logger).to(Logger).inSingletonScope();
+container.bind<Logger>(TYPES.Logger).to(Logger);
 
 // Services
 container.bind<RoleStealer>(TYPES.RoleStealer).to(RoleStealer).inSingletonScope();
