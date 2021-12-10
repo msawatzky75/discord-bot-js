@@ -11,10 +11,8 @@ import {ICommand} from "./commands/ICommand";
 import {Delete} from "./commands/Delete";
 import {Quote} from "./commands/Quote";
 import {createConnection, Repository} from "typeorm";
-import {GuildConfigRepository} from "./repositories/GuildConfig";
 import {Config} from "./commands/Config";
 import {GuildConfig} from "./entities/GuildConfig";
-import {GuildWhitelistRepository} from "./repositories/GuildWhitelist";
 import {GuildWhitelist} from "./entities/GuildWhitelist";
 
 dotenv.config();
@@ -71,11 +69,5 @@ container
 
 // Quote command options
 container.bind<string>(TYPES.QuoteChannel).toConstantValue(process.env.QUOTE_CHANNEL);
-
-container.bind<GuildConfigRepository>(TYPES.GuildConfig).to(GuildConfigRepository).inSingletonScope();
-container
-	.bind<GuildWhitelistRepository>(TYPES.GuildWhitelist)
-	.to(GuildWhitelistRepository)
-	.inSingletonScope();
 
 export default container;
