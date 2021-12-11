@@ -1,0 +1,22 @@
+name: Marty Nightly
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build the Docker image
+        run: docker build . -t msawatzky75/marty:nightly
+
+      - name: Login to docker
+        run: docker login -u msawatzky75 -p ${{secrets.DOCKER_ACCESS_TOKEN}}
+
+      - name: Push the Docker image
+        run: docker push msawatzky75/marty:nightly
