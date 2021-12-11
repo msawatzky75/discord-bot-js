@@ -24,10 +24,10 @@ export class Config extends Command implements ICommand {
 			const value = args.slice(1).join(" ");
 
 			switch (option) {
-				case "prefix":
-					return this.setPrefix(message, value);
 				case "admin":
 					return this.setAdmin(message);
+				case "prefix":
+					return this.setPrefix(message, value);
 				default:
 					return message.channel.send(`Unknown option ${option}`);
 			}

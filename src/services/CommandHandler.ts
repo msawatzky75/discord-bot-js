@@ -22,8 +22,6 @@ export class CommandHandler {
 			return Promise.reject();
 		}
 
-		this.logger.debug(JSON.stringify(await GuildConfig.findOne({guildId: message.guild.id})));
-
 		// get guild's whitelested channels and admin role
 		const [guildConfig, guildWhitelistedChannels] = await Promise.all([
 			GuildConfig.findOne(message.guild.id),
