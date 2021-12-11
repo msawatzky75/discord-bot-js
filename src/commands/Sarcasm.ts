@@ -16,7 +16,8 @@ export class Sarcasm implements ICommand {
 	}
 
 	public handle(message: Message): Promise<Message | Message[]> {
-		const content = message.content.substring(message.content.indexOf(this.name) + this.name.length);
+		const content = message.content.substring(this.getEndOfCommandIndex(message, this.prefix)).trim();
+
 		if (content) {
 			return message.reply(this.altenateCaps(content));
 		}
