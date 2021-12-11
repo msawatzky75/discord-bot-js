@@ -1,4 +1,4 @@
-name: Marty Nightly
+name: Marty Latest
 
 on:
   push:
@@ -13,10 +13,10 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build the Docker image
-        run: docker build . -t msawatzky75/marty:nightly
+        run: docker build . -t msawatzky75/marty:latest
 
       - name: Login to docker
         run: docker login -u msawatzky75 -p ${{secrets.DOCKER_ACCESS_TOKEN}}
 
       - name: Push the Docker image
-        run: docker push msawatzky75/marty:nightly
+        run: docker push msawatzky75/marty:latest
