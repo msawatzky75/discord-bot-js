@@ -1,5 +1,7 @@
 # Marty Bot
+
 [![Marty Nightly](https://github.com/msawatzky75/discord-bot-js/actions/workflows/docker-image.yml/badge.svg?branch=master)](https://github.com/msawatzky75/discord-bot-js/actions/workflows/docker-image.yml)
+
 ## Setup
 
 Requirements: [Yarn](https://yarnpkg.com/lang/en/docs/install/), Node (v16)
@@ -15,6 +17,12 @@ not have to run a separate install step. All the dependancies are already there.
 
    ```
    $ cp .env.default .env
+   ```
+
+1. Add ide helpers to your workspace:
+
+   ```
+   $ yarn dlx @yarnpkg/sdks vscode
    ```
 
 1. Build the bot using this command:

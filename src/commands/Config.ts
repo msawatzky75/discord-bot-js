@@ -1,19 +1,16 @@
 import {Message} from "discord.js";
-import {inject, injectable} from "inversify";
-import {Logger} from "../logger";
-import {GuildConfigRepository} from "../repositories/GuildConfig";
-import {TYPES} from "../types";
+import {injectable} from "inversify";
+import {GuildConfig} from "../entities/GuildConfig";
+import {Command} from "./Command";
 import {ICommand} from "./ICommand";
 
 @injectable()
-export class Config implements ICommand {
+export class Config extends Command implements ICommand {
 	public name = "config";
 	public description = "Configures the bot for the server";
 	public aliases: string[] = [];
 	public usage = "config <option> <value>";
-	@inject(TYPES.Logger) private logger: Logger;
-	@inject(TYPES.Prefix) private prefix: string;
-	@inject(TYPES.GuildConfig) private guildConfig: GuildConfigRepository;
+	public adminOnly = true;
 
 	public canHandle(message: Message): boolean {
 		return this.getEndOfCommandIndex(message, this.prefix) !== -1;
@@ -27,6 +24,8 @@ export class Config implements ICommand {
 			const value = args.slice(1).join(" ");
 
 			switch (option) {
+				case "admin":
+					return this.setAdmin(message);
 				case "prefix":
 					return this.setPrefix(message, value);
 				default:
@@ -36,29 +35,26 @@ export class Config implements ICommand {
 		return Promise.reject("No arguments provided");
 	}
 
+	private async setAdmin(message: Message) {
+		if (message.mentions.roles.size === 0) {
+			return message.channel.send("No role provided");
+		}
+		const guildConfig = await GuildConfig.findOneOrCreate(message.guild.id);
+		guildConfig.adminRole = message.mentions.roles.first().id;
+		guildConfig.save();
+
+		return message.channel.send("Admin role updated");
+	}
+
 	private async setPrefix(message: Message, prefix: string) {
 		if (prefix.length > 1) {
 			return message.channel.send("Prefix must be one character");
 		}
 
-		const guildConfig = await this.guildConfig.findOneOrCreate(message.guild.id);
+		const guildConfig = await GuildConfig.findOneOrCreate(message.guild.id);
 		guildConfig.prefix = prefix;
 		guildConfig.save();
 
 		return message.channel.send("Prefix updated");
-	}
-
-	private getEndOfCommandIndex(message: Message, prefix: string): number {
-		const commandWithPrefix = message.content.split(" ")[0];
-
-		const alias = [this.name, ...this.aliases].find((alias) =>
-			new RegExp(`${prefix}${alias}$`).test(commandWithPrefix),
-		);
-
-		if (alias) {
-			return message.content.indexOf(commandWithPrefix) + commandWithPrefix.length;
-		}
-
-		return -1;
 	}
 }

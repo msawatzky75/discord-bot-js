@@ -14,7 +14,7 @@ debug.enable(
 export class Logger {
 	public context: string;
 
-	private _log(message: string, scope?: string): void {
+	private _log(message: string | number | boolean, scope?: string): void {
 		const _message = `${new Date().toISOString()} - ${message}`;
 
 		if (scope) {
@@ -24,19 +24,20 @@ export class Logger {
 		}
 	}
 
-	public verbose(message: string): void {
+	public verbose(message: string | number | boolean): void {
 		this._log(message, "verbose");
 	}
 
-	public log(message: string): void {
+	public log(message: string | number | boolean): void {
 		this._log(message, "info");
 	}
 
-	public error(error: string): void {
-		this._log(error, "error");
+	public error(error: Error): void {
+		this._log(error.toString(), "error");
+		this._log(error.stack, "error.stack");
 	}
 
-	public debug(message: string): void {
+	public debug(message: string | number | boolean): void {
 		this._log(message, "debug");
 	}
 }
