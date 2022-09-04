@@ -1,7 +1,7 @@
 # Marty Bot
 
 [![Marty Latest](https://github.com/msawatzky75/discord-bot-js/actions/workflows/latest.yml/badge.svg?branch=master)](https://github.com/msawatzky75/discord-bot-js/actions/workflows/latest.yml)
-[![Marty Nightly](https://github.com/msawatzky75/discord-bot-js/actions/workflows/nightly.yml/badge.svg?branch=master)](https://github.com/msawatzky75/discord-bot-js/actions/workflows/nightly.yml)
+[![Marty Nightly](https://github.com/msawatzky75/discord-bot-js/actions/workflows/nightly.yml/badge.svg?branch=dev)](https://github.com/msawatzky75/discord-bot-js/actions/workflows/nightly.yml)
 
 ## Setup
 
@@ -69,12 +69,14 @@ There are some commands to help you develop the bot:
    $ yarn dev
    ```
 
-
 # First Time Setup
+
 In order for the slash commands to work, they need to be registered before
 the bot can process them. This is handled by the
+
 ```
 $ yarn register
 ```
+
 command. this only needs to be run once, and once evertime you add, remove,
 or update command names and descriptions.
