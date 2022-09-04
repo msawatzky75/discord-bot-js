@@ -44,10 +44,12 @@ export default async function RoleStealer(message: Message) {
 		message.delete();
 	}
 
-	// send a message to the channel that invoked the command indicating the roles were stolen
-	message.channel.send(
-		`${message.author} has stolen the ${roles.map((role) => role.name).join(", ")} role(s) from ${
-			victims.size
-		} user(s)`,
-	);
+	if (process.env.ROLE_STEALER_CONFIRMATION) {
+		// send a message to the channel that invoked the command indicating the roles were stolen
+		message.channel.send(
+			`${message.author} has stolen the ${roles.map((role) => role.name).join(", ")} role(s) from ${
+				victims.size
+			} user(s)`,
+		);
+	}
 }
