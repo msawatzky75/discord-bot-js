@@ -80,3 +80,8 @@ $ yarn register
 
 command. this only needs to be run once, and once evertime you add, remove,
 or update command names and descriptions.
+
+or in docker: 
+```
+$ docker exec marty yarn register
+```
