@@ -1,43 +1,36 @@
 {
 	"name": "discord-bot-js",
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"private": true,
 	"repository": "git@github.com:msawatzky75/discord-bot-js.git",
 	"author": "Matthew Sawatzky <msawatzky75@gmail.com>",
 	"license": "MIT",
+	"type": "module",
 	"scripts": {
 		"start": "node dist/index.js",
 		"watch": "tsc -p tsconfig.json -w",
 		"build": "tsc -p tsconfig.json",
-		"dev": "nodemon dist/index.js --debug=\"bot.*\"",
-		"prettier": "prettier --write ."
+		"dev": "DEBUG=\"bot.*\" nodemon dist/index.js",
+		"prettier": "prettier --write .",
+		"register": "DEBUG=\"bot.register-commands\" node ./dist/register-commands.js"
 	},
 	"dependencies": {
-		"debug": "^4.3.2",
-		"discord.js": "^13.3.1",
-		"dotenv": "^10.0.0",
-		"inversify": "^6.0.1",
-		"moment": "^2.29.1",
-		"moment-timezone": "^0.5.34",
-		"reflect-metadata": "^0.1.13",
-		"sqlite": "^4.0.23",
-		"sqlite3": "^5.0.2",
-		"ts-node": "^10.4.0",
-		"typeorm": "^0.2.40",
-		"typescript": "^4.4.4",
-		"words-to-numbers": "^1.5.1"
+		"@discordjs/rest": "^1.1.0",
+		"debug": "^4.3.4",
+		"discord.js": "^14.3.0",
+		"dotenv": "^16.0.2",
+		"typescript": "^4.8.2"
 	},
 	"devDependencies": {
 		"@types/debug": "^4.1.7",
-		"@types/dotenv": "^6.1.1",
 		"@types/node": "^16.11.7",
-		"@typescript-eslint/eslint-plugin": "^5.3.1",
-		"@typescript-eslint/parser": "^5.3.1",
-		"eslint": "^8.2.0",
-		"eslint-config-prettier": "^8.3.0",
-		"eslint-plugin-import": "^2.25.3",
-		"nodemon": "^2.0.15",
-		"prettier": "^2.4.1"
+		"@typescript-eslint/eslint-plugin": "^5.36.1",
+		"@typescript-eslint/parser": "^5.36.1",
+		"eslint": "^8.23.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-import": "^2.26.0",
+		"nodemon": "^2.0.19",
+		"prettier": "^2.7.1"
 	},
-	"packageManager": "yarn@3.1.0"
+	"packageManager": "yarn@3.2.3"
 }

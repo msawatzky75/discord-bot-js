@@ -1,5 +1,8 @@
 # Marty Bot
-[![Marty Nightly](https://github.com/msawatzky75/discord-bot-js/actions/workflows/docker-image.yml/badge.svg?branch=master)](https://github.com/msawatzky75/discord-bot-js/actions/workflows/docker-image.yml)
+
+[![Marty Latest](https://github.com/msawatzky75/discord-bot-js/actions/workflows/latest.yml/badge.svg?branch=master)](https://github.com/msawatzky75/discord-bot-js/actions/workflows/latest.yml)
+[![Marty Nightly](https://github.com/msawatzky75/discord-bot-js/actions/workflows/nightly.yml/badge.svg?branch=master)](https://github.com/msawatzky75/discord-bot-js/actions/workflows/nightly.yml)
+
 ## Setup
 
 Requirements: [Yarn](https://yarnpkg.com/lang/en/docs/install/), Node (v16)
@@ -15,6 +18,12 @@ not have to run a separate install step. All the dependancies are already there.
 
    ```
    $ cp .env.default .env
+   ```
+
+1. Add ide helpers to your workspace:
+
+   ```
+   $ yarn dlx @yarnpkg/sdks vscode
    ```
 
 1. Build the bot using this command:
@@ -60,16 +69,12 @@ There are some commands to help you develop the bot:
    $ yarn dev
    ```
 
-## Code Structure
 
-The only thing this bot can do is run a service for each message that gets sent.
-These are defined in the [services](src/services) folder.
-But this does not mean the bot handle commands.
-
-The [CommandHandler](src/services/CommandHandler) is the command service, which watches for command-like messages. See [commands](src/commands/README.md) for the commands that are available and how to structure new ones.
-
-## Dependency Injection
-
-All configuration is done through dependency injection.
-
-Define your dependencies in [inversify.config.ts](inversify.config.ts) file, and inject your dependencies into where you need them.
+# First Time Setup
+In order for the slash commands to work, they need to be registered before
+the bot can process them. This is handled by the
+```
+$ yarn register
+```
+command. this only needs to be run once, and once evertime you add, remove,
+or update command names and descriptions.

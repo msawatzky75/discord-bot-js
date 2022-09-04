@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"module": "commonjs",
+		"module": "ESNext",
 		"target": "esnext",
 		"noImplicitAny": true,
 		"moduleResolution": "node",
@@ -8,7 +8,9 @@
 		"outDir": "dist",
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
-		"types": ["node", "reflect-metadata"]
+		"skipLibCheck": true,
+		"types": ["node"],
+		"baseUrl": "./"
 	},
 	"include": ["src/**/*"]
 }
