@@ -1,13 +1,9 @@
 import debug from "debug";
 import {Collection, Message, Snowflake, GuildMember, Role} from "discord.js";
-import dotenv from "dotenv";
-
-dotenv.config();
+import Config from "../config.js";
 
 const d = debug("bot.services.role-stealer");
 const dv = debug("verbose.bot.services.role-stealer");
-
-const StealableRoles: string[] = [...(process.env.STEALABLE_ROLES || "").split(",")].filter(Boolean);
 
 export default async function RoleStealer(message: Message) {
 	if (!message.inGuild()) return;
@@ -15,7 +11,7 @@ export default async function RoleStealer(message: Message) {
 	if (message.mentions.roles.size === 0) return;
 
 	const roles: Collection<Snowflake, Role> = message.mentions.roles.filter((role) =>
-		StealableRoles.includes(role.id),
+		Config.RoleStealer.Roles.includes(role.id),
 	);
 	if (roles.size === 0) return;
 
@@ -40,11 +36,11 @@ export default async function RoleStealer(message: Message) {
 	message.member.roles.add(roles);
 
 	// remove the message that invoked the command
-	if (message.deletable) {
+	if (Config.RoleStealer.Delete && message.deletable) {
 		message.delete();
 	}
 
-	if (process.env.ROLE_STEALER_CONFIRMATION) {
+	if (Config.RoleStealer.Confirmation) {
 		// send a message to the channel that invoked the command indicating the roles were stolen
 		message.channel.send(
 			`${message.author} has stolen the ${roles.map((role) => role.name).join(", ")} role(s) from ${
