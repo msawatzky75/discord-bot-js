@@ -2,12 +2,9 @@ import debug from "debug";
 import {Client, GatewayIntentBits} from "discord.js";
 import commands from "./commands/index.js";
 import services from "./services/index.js";
-import dotenv from "dotenv";
-
-dotenv.config();
+import Config from "./config.js";
 
 const d = debug("bot.index");
-const dv = debug("verbose.bot.index");
 
 const client = new Client({
 	intents: [
@@ -21,6 +18,8 @@ const client = new Client({
 
 client.on("ready", () => {
 	d(`Logged in as ${client.user.tag}!`);
+	client.user.setActivity("v" + Config.Version);
+	client.user.setStatus("online");
 });
 
 client.on("interactionCreate", async (interaction) => {
@@ -40,4 +39,4 @@ client.on("messageCreate", async (message) => {
 	await Promise.all(services.map((service) => service?.(message)));
 });
 
-client.login(process.env.TOKEN);
+client.login(Config.Token);

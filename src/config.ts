@@ -1,8 +1,10 @@
 import {Snowflake} from "discord.js";
+import Package from "../package.json" assert {type: "json"};
 import dotenv from "dotenv";
 dotenv.config();
 
 const config = {
+	Version: Package.version,
 	Token: process.env.TOKEN,
 	Client: process.env.CLIENT,
 	Guild: process.env.GUILD as Snowflake,

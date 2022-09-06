@@ -4,13 +4,13 @@
 		"target": "esnext",
 		"noImplicitAny": true,
 		"moduleResolution": "node",
+		"resolveJsonModule": true,
 		"esModuleInterop": true,
 		"outDir": "dist",
-		"emitDecoratorMetadata": true,
-		"experimentalDecorators": true,
 		"skipLibCheck": true,
 		"types": ["node"],
 		"baseUrl": "./"
 	},
-	"include": ["src/**/*"]
+	"files": ["src/index.ts"],
+	"include": ["src/**/*.d.ts"]
 }
