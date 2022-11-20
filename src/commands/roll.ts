@@ -31,7 +31,7 @@ const command: Command = {
 		const allOutcomes: number[] = [];
 
 		for (let i = 0; i < dice; i++) {
-			allOutcomes.push(Math.floor(Math.random() * outcomes));
+			allOutcomes.push(Math.floor(Math.random() * outcomes) + 1);
 		}
 
 		await interaction.reply(`Rolling ${dice}d${outcomes}: ` + allOutcomes.join(", "));
