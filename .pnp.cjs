@@ -2299,7 +2299,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/json5-npm-1.0.1-647fc8794b-e76ea23dbb.zip/node_modules/json5/",\
           "packageDependencies": [\
             ["json5", "npm:1.0.1"],\
-            ["minimist", "npm:1.2.0"]\
+            ["minimist", "npm:1.2.7"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -2426,17 +2426,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["minimist", [\
-        ["npm:1.2.0", {\
-          "packageLocation": "./.yarn/cache/minimist-npm-1.2.0-214f53c090-72473f0fce.zip/node_modules/minimist/",\
+        ["npm:1.2.7", {\
+          "packageLocation": "./.yarn/cache/minimist-npm-1.2.7-51d33b1371-7346574a10.zip/node_modules/minimist/",\
           "packageDependencies": [\
-            ["minimist", "npm:1.2.0"]\
-          ],\
-          "linkType": "HARD"\
-        }],\
-        ["npm:1.2.6", {\
-          "packageLocation": "./.yarn/cache/minimist-npm-1.2.6-f4cee4b4af-d15428cd1e.zip/node_modules/minimist/",\
-          "packageDependencies": [\
-            ["minimist", "npm:1.2.6"]\
+            ["minimist", "npm:1.2.7"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -3437,7 +3430,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["tsconfig-paths", "npm:3.14.1"],\
             ["@types/json5", "npm:0.0.29"],\
             ["json5", "npm:1.0.1"],\
-            ["minimist", "npm:1.2.6"],\
+            ["minimist", "npm:1.2.7"],\
             ["strip-bom", "npm:3.0.0"]\
           ],\
           "linkType": "HARD"\
