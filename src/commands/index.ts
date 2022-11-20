@@ -2,13 +2,14 @@ import {Collection, SlashCommandBuilder, ChatInputCommandInteraction} from "disc
 
 // https://github.com/microsoft/TypeScript/issues/15479
 import quote from "./quote.js";
+import roll from "./roll.js";
 
 export interface Command {
 	data: SlashCommandBuilder;
 	execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
 }
 
-const rawCommands = [quote];
+const rawCommands = [quote, roll];
 
 const commands = new Collection<string, Command>();
 
