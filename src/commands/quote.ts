@@ -11,7 +11,10 @@ const command: Command = {
 
 	async execute(interaction: ChatInputCommandInteraction): Promise<void> {
 		// get a random message from the quote channel and send it to the channel the command was sent in
-		const quoteChannel = interaction.guild.channels.cache.get(process.env.QUOTE_CHANNEL);
+		const quoteChannel = interaction.guild.channels.cache.find((c) => {
+			if (!(c instanceof TextChannel)) return false;
+			return c.topic?.includes("#quotes");
+		});
 
 		if (!(quoteChannel instanceof TextChannel)) throw new Error("Could not find quote channel");
 
