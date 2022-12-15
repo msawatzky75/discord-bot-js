@@ -11,6 +11,6 @@
 		"types": ["node"],
 		"baseUrl": "./"
 	},
-	"files": ["src/index.ts", "src/register-commands.ts"],
+	"files": ["src/index.ts"],
 	"include": ["src/**/*.d.ts"]
 }
