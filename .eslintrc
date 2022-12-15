@@ -12,7 +12,7 @@
 		"prefer-arrow-callback": ["error", {"allowNamedFunctions": true}],
 		"class-methods-use-this": "off",
 		"no-return-assign": ["error", "except-parens"],
-		"no-console": "off",
+		"no-console": "warn",
 		"max-statements": ["warn", {"max": 100}],
 		"no-plusplus": "off",
 		"no-unused-vars": "off",

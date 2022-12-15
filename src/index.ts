@@ -32,7 +32,7 @@ client.on("ready", () => {
 					body: commands.map((c) => c.data.toJSON()),
 				})
 				.then((data: {name: string}[]) => {
-					console.log(
+					d(
 						`Successfully registered '${data.map((d) => d.name).join(", ")}' to '${guild.name}' (${
 							guild.id
 						})`,
