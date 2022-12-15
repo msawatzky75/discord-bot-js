@@ -1,5 +1,6 @@
 import debug from "debug";
-import {Client, GatewayIntentBits} from "discord.js";
+import {Client, GatewayIntentBits, Routes} from "discord.js";
+import {REST} from "@discordjs/rest";
 import commands from "./commands/index.js";
 import services from "./services/index.js";
 import Config from "./config.js";
@@ -20,6 +21,25 @@ client.on("ready", () => {
 	d(`Logged in as ${client.user.tag}!`);
 	client.user.setActivity("v" + Config.Version);
 	client.user.setStatus("online");
+
+	// get list of guilds and register the commands on them
+	const rest = new REST({version: "10"}).setToken(process.env.TOKEN);
+
+	if (process.env.AUTO_REGISTER) {
+		client.guilds.cache.map((guild) => {
+			rest
+				.put(Routes.applicationGuildCommands(process.env.CLIENT, guild.id), {
+					body: commands.map((c) => c.data.toJSON()),
+				})
+				.then((data: {name: string}[]) => {
+					console.log(
+						`Successfully registered '${data.map((d) => d.name).join(", ")}' to '${guild.name}' (${
+							guild.id
+						})`,
+					);
+				}, d);
+		});
+	}
 });
 
 client.on("interactionCreate", async (interaction) => {
