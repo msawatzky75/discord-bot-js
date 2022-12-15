@@ -72,16 +72,5 @@ There are some commands to help you develop the bot:
 # First Time Setup
 
 In order for the slash commands to work, they need to be registered before
-the bot can process them. This is handled by the
-
-```
-$ yarn register
-```
-
-command. this only needs to be run once, and once evertime you add, remove,
-or update command names and descriptions.
-
-or in docker: 
-```
-$ docker exec marty yarn register
-```
+the bot can process them. This is done automatically when the `AUTO_REGISTER` environment
+variable is set to `true`.

@@ -11,8 +11,7 @@
 		"watch": "tsc -p tsconfig.json -w",
 		"build": "rimraf dist && tsc -p tsconfig.json",
 		"dev": "DEBUG=\"bot.*\" nodemon dist/src/index.js",
-		"prettier": "prettier --write .",
-		"register": "DEBUG=\"bot.register-commands\" node ./dist/src/register-commands.js"
+		"prettier": "prettier --write ."
 	},
 	"dependencies": {
 		"@discordjs/rest": "^1.1.0",
