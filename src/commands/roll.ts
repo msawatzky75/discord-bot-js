@@ -11,7 +11,7 @@ const command: Command = {
 				.setName("dice")
 				.setMinValue(0)
 				.setMaxValue(100)
-				.setRequired(true)
+				.setRequired(false)
 				.setDescription("Number of dice to roll"),
 		)
 		.addNumberOption((b) =>
@@ -19,15 +19,15 @@ const command: Command = {
 				.setName("outcomes")
 				.setMinValue(2)
 				.setMaxValue(100_000)
-				.setRequired(true)
+				.setRequired(false)
 				.setDescription("Number of possible outcomes"),
 		)
 		.setName("roll")
 		.setDescription("Roll one or more dice."),
 
 	async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-		const dice = interaction.options.getNumber("dice") ?? 0;
-		const outcomes = interaction.options.getNumber("outcomes") ?? 2;
+		const dice = interaction.options.getNumber("dice") ?? 1;
+		const outcomes = interaction.options.getNumber("outcomes") ?? 20;
 		const allOutcomes: number[] = [];
 
 		for (let i = 0; i < dice; i++) {
