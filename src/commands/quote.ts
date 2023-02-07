@@ -1,5 +1,5 @@
 import debug from "debug";
-import {ChatInputCommandInteraction, SlashCommandBuilder, TextChannel} from "discord.js";
+import {ChatInputCommandInteraction, Collection, Message, SlashCommandBuilder, TextChannel} from "discord.js";
 import type {Command} from "./index";
 
 const d = debug("bot.commands.quote");
@@ -18,7 +18,22 @@ const command: Command = {
 
 		if (!(quoteChannel instanceof TextChannel)) throw new Error("Could not find quote channel");
 
-		const messages = await quoteChannel.messages.fetch({limit: 100});
+		const limit = 2;
+
+		let messages: Collection<string, Message<true>> = new Collection();
+		let fetchedMessageCount = 0;
+		let pages = 0;
+
+		do {
+			d(`fetching ${limit} new messages...`);
+			const newMessages = await quoteChannel.messages.fetch({limit: limit, before: messages.last()?.id});
+			fetchedMessageCount = newMessages.size;
+			messages = messages.concat(newMessages);
+			pages++;
+		} while (fetchedMessageCount === limit);
+
+		d(`fetched ${messages.size} messages over ${pages} pages`);
+
 		const randomMessage = messages.random();
 
 		// replace mentions with their names
