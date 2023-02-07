@@ -18,7 +18,7 @@ const command: Command = {
 
 		if (!(quoteChannel instanceof TextChannel)) throw new Error("Could not find quote channel");
 
-		const limit = 2;
+		const limit = 100;
 
 		let messages: Collection<string, Message<true>> = new Collection();
 		let fetchedMessageCount = 0;
