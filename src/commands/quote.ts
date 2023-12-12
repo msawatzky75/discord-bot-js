@@ -1,18 +1,8 @@
 import debug from "debug";
-import {
-	ChatInputCommandInteraction,
-	Collection,
-	Message,
-	SlashCommandBuilder,
-	Snowflake,
-	TextChannel,
-} from "discord.js";
+import {ChatInputCommandInteraction, Collection, Message, SlashCommandBuilder, TextChannel} from "discord.js";
 import type {Command} from "./index";
 
 const d = debug("bot.commands.quote");
-const messages = new Collection<Snowflake, Collection<string, Message<true>>>();
-const lastUpdate = new Collection<Snowflake, Date>();
-const cacheLife = 1000 * 60 * 15; // 15 minutes
 
 const command: Command = {
 	data: new SlashCommandBuilder()
@@ -28,19 +18,23 @@ const command: Command = {
 
 		if (!(quoteChannel instanceof TextChannel)) throw new Error("Could not find quote channel");
 
-		let serverMessages = messages.get(quoteChannel.guildId);
-		let timeSinceUpdate = new Date().getTime() - (lastUpdate.get(quoteChannel.guildId)?.getTime() ?? 0);
+		const limit = 100;
 
-		if (!serverMessages) {
-			d(`No cache for ${quoteChannel.guild.name}, fetching quotes...`);
-			await UpdateMessages(quoteChannel);
-		}
-		if (timeSinceUpdate >= cacheLife) {
-			d(`Cache expired for ${quoteChannel.guild.name}, fetching quotes...`);
-			await UpdateMessages(quoteChannel);
-		}
+		let messages: Collection<string, Message<true>> = new Collection();
+		let fetchedMessageCount = 0;
+		let pages = 0;
 
-		const randomMessage = messages.get(quoteChannel.guildId).random();
+		do {
+			d(`fetching ${limit} new messages...`);
+			const newMessages = await quoteChannel.messages.fetch({limit: limit, before: messages.last()?.id});
+			fetchedMessageCount = newMessages.size;
+			messages = messages.concat(newMessages);
+			pages++;
+		} while (fetchedMessageCount === limit);
+
+		d(`fetched ${messages.size} messages over ${pages} pages`);
+
+		const randomMessage = messages.random();
 
 		// replace mentions with their names
 		const content = randomMessage.content.replace(/<@!?(\d+)>/g, (match) => {
@@ -52,25 +46,5 @@ const command: Command = {
 		await interaction.reply(content);
 	},
 };
-
-async function UpdateMessages(quoteChannel: TextChannel) {
-	const limit = 100;
-
-	let quoteMessages: Collection<string, Message<true>> = new Collection();
-	let fetchedMessageCount = 0;
-	let pages = 0;
-
-	do {
-		d(`fetching ${limit} new messages...`);
-		const newMessages = await quoteChannel.messages.fetch({limit: limit, before: quoteMessages.last()?.id});
-		fetchedMessageCount = newMessages.size;
-		quoteMessages = quoteMessages.concat(newMessages);
-		pages++;
-	} while (fetchedMessageCount === limit);
-
-	d(`fetched ${quoteMessages.size} messages over ${pages} pages`);
-	messages.set(quoteChannel.guildId, quoteMessages);
-	lastUpdate.set(quoteChannel.guildId, new Date());
-}
 
 export default command;
