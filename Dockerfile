@@ -1,4 +1,4 @@
-FROM node:lts-alpine as build
+FROM node:18-alpine as build
 WORKDIR /app
 COPY . .
 RUN yarn build

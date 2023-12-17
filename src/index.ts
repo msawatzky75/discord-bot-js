@@ -1,5 +1,5 @@
 import debug from "debug";
-import {Client, GatewayIntentBits, Routes} from "discord.js";
+import {Client, GatewayIntentBits, Partials, Routes} from "discord.js";
 import {REST} from "@discordjs/rest";
 import commands from "./commands/index.js";
 import services from "./services/index.js";
@@ -15,6 +15,7 @@ const client = new Client({
 		GatewayIntentBits.GuildMembers,
 		GatewayIntentBits.GuildPresences,
 	],
+	partials: [Partials.Message],
 });
 
 client.on("ready", () => {
