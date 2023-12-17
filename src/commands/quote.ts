@@ -28,16 +28,16 @@ const command: Command = {
 
 		if (!(quoteChannel instanceof TextChannel)) throw new Error("Could not find quote channel");
 
-		let serverMessages = messages.get(quoteChannel.guildId);
-		let timeSinceUpdate = new Date().getTime() - (lastUpdate.get(quoteChannel.guildId)?.getTime() ?? 0);
+		const serverMessages = messages.get(quoteChannel.guildId);
+		const timeSinceUpdate = new Date().getTime() - (lastUpdate.get(quoteChannel.guildId)?.getTime() ?? 0);
 
 		if (!serverMessages) {
 			d(`No cache for ${quoteChannel.guild.name}, fetching quotes...`);
-			await UpdateMessages(quoteChannel);
+			await updateMessages(quoteChannel);
 		}
 		if (timeSinceUpdate >= cacheLife) {
 			d(`Cache expired for ${quoteChannel.guild.name}, fetching quotes...`);
-			await UpdateMessages(quoteChannel);
+			await updateMessages(quoteChannel);
 		}
 
 		const randomMessage = messages.get(quoteChannel.guildId).random();
@@ -53,7 +53,7 @@ const command: Command = {
 	},
 };
 
-async function UpdateMessages(quoteChannel: TextChannel) {
+async function updateMessages(quoteChannel: TextChannel) {
 	const limit = 100;
 
 	let quoteMessages: Collection<string, Message<true>> = new Collection();
