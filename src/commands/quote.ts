@@ -8,14 +8,22 @@ import {
 	TextChannel,
 } from "discord.js";
 import type {Command} from "./index";
+import Fuse from "fuse.js";
+import type {IFuseOptions} from "fuse.js";
+import util from "../util.js";
 
 const d = debug("bot.commands.quote");
 const messages = new Collection<Snowflake, Collection<string, Message<true>>>();
 const lastUpdate = new Collection<Snowflake, Date>();
 const cacheLife = 1000 * 60 * 15; // 15 minutes
 
+const fuseOptions: IFuseOptions<Message<true>> = {
+	keys: [{name: "content", weight: 1}],
+};
+
 const command: Command = {
 	data: new SlashCommandBuilder()
+		.addStringOption((b) => b.setName("search").setRequired(false).setDescription("Fuzzy search all quotes"))
 		.setName("quote")
 		.setDescription("Sends a random quote from the quote wall."),
 
@@ -28,29 +36,55 @@ const command: Command = {
 
 		if (!(quoteChannel instanceof TextChannel)) throw new Error("Could not find quote channel");
 
-		const serverMessages = messages.get(quoteChannel.guildId);
+		let serverMessages = messages.get(quoteChannel.guildId);
 		const timeSinceUpdate = new Date().getTime() - (lastUpdate.get(quoteChannel.guildId)?.getTime() ?? 0);
+		const search = interaction.options.getString("search");
 
 		if (!serverMessages) {
 			d(`No cache for ${quoteChannel.guild.name}, fetching quotes...`);
-			interaction.reply("Fetching quotes. This may take some time...");
+			await util.sendReply(interaction, {
+				content: "Fetching quotes. This may take some time...",
+				ephemeral: true,
+			});
 			await updateMessages(quoteChannel);
+			serverMessages = messages.get(quoteChannel.guildId);
 		} else if (timeSinceUpdate >= cacheLife) {
 			d(`Cache expired for ${quoteChannel.guild.name}, fetching quotes...`);
-			await interaction.reply("Cache expired, refreshing. This may take some time...");
+			await util.sendReply(interaction, {
+				content: "Cache expired, refreshing. This may take some time...",
+				ephemeral: true,
+			});
 			await updateMessages(quoteChannel);
+			serverMessages = messages.get(quoteChannel.guildId);
 		}
 
-		const randomMessage = messages.get(quoteChannel.guildId).random();
+		let selcetedMessage: Message;
+		if (search && serverMessages) {
+			await util.sendReply(interaction, {content: "Searching...", ephemeral: true});
+			const fuse = new Fuse(
+				serverMessages.map((m) => m),
+				fuseOptions,
+			);
+			const results = fuse.search(search, {limit: 1});
+			if (results.length) selcetedMessage = getRandom(results).item;
+			else await util.sendReply(interaction, {content: "Failed to find a match.", ephemeral: true});
+		}
+		if (!selcetedMessage) {
+			selcetedMessage = messages.get(quoteChannel.guildId).random();
+		}
 
 		// replace mentions with their names
-		const content = randomMessage.content.replace(/<@!?(\d+)>/g, (match) => {
+		const content = selcetedMessage.content.replace(/<@!?(\d+)>/g, (match) => {
 			const id = match.replace(/<@!?/, "").replace(/>/, "");
-			const member = randomMessage.mentions.users.get(id);
+			const member = selcetedMessage.mentions.users.get(id);
 			return `**${member.username.trim()}**`;
 		});
 
-		interaction.replied ? await interaction.editReply(content) : await interaction.reply(content);
+		if (interaction.replied) {
+			interaction.followUp(content);
+		} else {
+			interaction.reply(content);
+		}
 	},
 };
 
@@ -72,6 +106,10 @@ async function updateMessages(quoteChannel: TextChannel) {
 	d(`fetched ${quoteMessages.size} messages over ${pages} pages`);
 	messages.set(quoteChannel.guildId, quoteMessages);
 	lastUpdate.set(quoteChannel.guildId, new Date());
+}
+
+function getRandom<T>(items: T[]) {
+	return items[Math.floor(Math.random() * items.length)];
 }
 
 export default command;

@@ -37,6 +37,7 @@ const RAW_RUNTIME_STATE =
           ["eslint", "npm:8.56.0"],\
           ["eslint-config-prettier", "virtual:b88d348178427fd7c2f1b73b522fa1ad47a441ca74ffd4f5e03c79de6435cf5e19682d611bf2b693e0435fb46342d079433bbaa38e995d4a88b91cf36b24e6fc#npm:9.1.0"],\
           ["eslint-plugin-import", "virtual:b88d348178427fd7c2f1b73b522fa1ad47a441ca74ffd4f5e03c79de6435cf5e19682d611bf2b693e0435fb46342d079433bbaa38e995d4a88b91cf36b24e6fc#npm:2.29.1"],\
+          ["fuse.js", "npm:7.0.0"],\
           ["nodemon", "npm:3.0.2"],\
           ["prettier", "npm:3.1.1"],\
           ["rimraf", "npm:5.0.5"],\
@@ -1372,6 +1373,7 @@ const RAW_RUNTIME_STATE =
           ["eslint", "npm:8.56.0"],\
           ["eslint-config-prettier", "virtual:b88d348178427fd7c2f1b73b522fa1ad47a441ca74ffd4f5e03c79de6435cf5e19682d611bf2b693e0435fb46342d079433bbaa38e995d4a88b91cf36b24e6fc#npm:9.1.0"],\
           ["eslint-plugin-import", "virtual:b88d348178427fd7c2f1b73b522fa1ad47a441ca74ffd4f5e03c79de6435cf5e19682d611bf2b693e0435fb46342d079433bbaa38e995d4a88b91cf36b24e6fc#npm:2.29.1"],\
+          ["fuse.js", "npm:7.0.0"],\
           ["nodemon", "npm:3.0.2"],\
           ["prettier", "npm:3.1.1"],\
           ["rimraf", "npm:5.0.5"],\
@@ -2000,6 +2002,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/functions-have-names-npm-1.2.3-e5cf1e2208-0ddfd3ed10.zip/node_modules/functions-have-names/",\
         "packageDependencies": [\
           ["functions-have-names", "npm:1.2.3"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["fuse.js", [\
+      ["npm:7.0.0", {\
+        "packageLocation": "./.yarn/cache/fuse.js-npm-7.0.0-8a5f379683-d75d35f2d6.zip/node_modules/fuse.js/",\
+        "packageDependencies": [\
+          ["fuse.js", "npm:7.0.0"]\
         ],\
         "linkType": "HARD"\
       }]\
