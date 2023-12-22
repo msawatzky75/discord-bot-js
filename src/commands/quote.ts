@@ -33,10 +33,11 @@ const command: Command = {
 
 		if (!serverMessages) {
 			d(`No cache for ${quoteChannel.guild.name}, fetching quotes...`);
+			interaction.reply("Fetching quotes. This may take some time...");
 			await updateMessages(quoteChannel);
-		}
-		if (timeSinceUpdate >= cacheLife) {
+		} else if (timeSinceUpdate >= cacheLife) {
 			d(`Cache expired for ${quoteChannel.guild.name}, fetching quotes...`);
+			await interaction.reply("Cache expired, refreshing. This may take some time...");
 			await updateMessages(quoteChannel);
 		}
 
@@ -49,7 +50,7 @@ const command: Command = {
 			return `**${member.username.trim()}**`;
 		});
 
-		await interaction.reply(content);
+		interaction.replied ? await interaction.editReply(content) : await interaction.reply(content);
 	},
 };
 
