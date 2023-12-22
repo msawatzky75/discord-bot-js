@@ -4,6 +4,7 @@ import {REST} from "@discordjs/rest";
 import commands from "./commands/index.js";
 import services from "./services/index.js";
 import Config from "./config.js";
+import util from "./util.js";
 
 const d = debug("bot.index");
 
@@ -51,7 +52,10 @@ client.on("interactionCreate", async (interaction) => {
 		await command.execute(interaction);
 	} catch (err) {
 		d(err);
-		await interaction.reply({content: "There was an error while executing this command!", ephemeral: true});
+		await util.sendReply(interaction, {
+			content: "There was an error while executing this command!",
+			ephemeral: true,
+		});
 	}
 });
 
