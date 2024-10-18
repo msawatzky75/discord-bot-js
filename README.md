@@ -69,8 +69,13 @@ There are some commands to help you develop the bot:
    $ yarn dev
    ```
 
-# First Time Setup
+## First Time Setup
 
 In order for the slash commands to work, they need to be registered before
 the bot can process them. This is done automatically when the `AUTO_REGISTER` environment
 variable is set to `true`.
+
+## FAQ
+
+If you're having trouble with vscode not showing types correctly, switch the typescript
+version to the one located in the `.yarn/sdks/typescript/lib` folder
