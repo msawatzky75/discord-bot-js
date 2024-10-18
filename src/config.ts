@@ -1,7 +1,10 @@
 import {Snowflake} from "discord.js";
-import Package from "../package.json" assert {type: "json"};
+import Package from "../package.json" with {type: "json"};
 import dotenv from "dotenv";
+import debug from "debug";
+
 dotenv.config();
+const d = debug("bot.config");
 
 const config = {
 	Version: Package.version,
@@ -16,5 +19,8 @@ const config = {
 		),
 	},
 };
+
+d("Config Loaded:");
+d(JSON.stringify({...config, Token: "REDACTED"}, null, "\t"));
 
 export default config;

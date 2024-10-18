@@ -1,11 +1,11 @@
-import {Collection, SlashCommandBuilder, ChatInputCommandInteraction} from "discord.js";
+import {Collection, ChatInputCommandInteraction, SlashCommandOptionsOnlyBuilder} from "discord.js";
 
 // https://github.com/microsoft/TypeScript/issues/15479
 import quote from "./quote.js";
 import roll from "./roll.js";
 
 export interface Command {
-	data: SlashCommandBuilder;
+	data: SlashCommandOptionsOnlyBuilder;
 	execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
 }
 
