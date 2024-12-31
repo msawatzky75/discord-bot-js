@@ -1,6 +1,6 @@
-FROM node:22-alpine as build
+FROM node:20-alpine as build
 WORKDIR /app
 COPY . .
-RUN yarn build
+RUN npm run build
 ENV DEBUG=bot.*
-CMD ["yarn", "start"]
+CMD ["npm", "run", "start"]

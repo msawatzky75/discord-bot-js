@@ -1,15 +1,6 @@
 dist/
 
-# yarn zero-install
-.yarn/*
-!.yarn/cache
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
+node_modules
 
 .env*
 !.env.default
-
-database.sqlite
