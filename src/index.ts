@@ -49,6 +49,7 @@ client.on("interactionCreate", async (interaction) => {
 
 	const command = commands.get(interaction.commandName);
 	try {
+		await interaction.deferReply();
 		await command.execute(interaction);
 	} catch (err) {
 		d(err);

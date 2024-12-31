@@ -42,17 +42,15 @@ const command: Command = {
 
 		if (!serverMessages) {
 			d(`No cache for ${quoteChannel.guild.name}, fetching quotes...`);
-			await interaction.deferReply();
 			await updateMessages(quoteChannel);
 			serverMessages = messages.get(quoteChannel.guildId);
 		} else if (timeSinceUpdate >= cacheLife) {
 			d(`Cache expired for ${quoteChannel.guild.name}, fetching quotes...`);
-			await interaction.deferReply();
 			await updateMessages(quoteChannel);
 			serverMessages = messages.get(quoteChannel.guildId);
 		}
 
-		let selcetedMessage: Message;
+		let selectedMessage: Message;
 		if (search && serverMessages) {
 			if (!interaction.deferred) {
 				await interaction.deferReply();
@@ -62,32 +60,26 @@ const command: Command = {
 				fuseOptions,
 			);
 			const results = fuse.search(search, {limit: 1});
-			if (results.length) selcetedMessage = getRandom(results).item;
+			if (results.length) selectedMessage = getRandom(results).item;
 			else {
 				d("Failed to find match for quote search");
-				await interaction.followUp({content: "Failed to find a match."});
+				await util.sendReply(interaction, "Failed to find a match.");
 				return;
 			}
 		}
 
-		if (!selcetedMessage) {
-			selcetedMessage = messages.get(quoteChannel.guildId).random();
+		if (!selectedMessage) {
+			selectedMessage = messages.get(quoteChannel.guildId).random();
 		}
 
 		// replace mentions with their names
-		const content = selcetedMessage.content.replace(/<@!?(\d+)>/g, (match) => {
+		const content = selectedMessage.content.replace(/<@!?(\d+)>/g, (match) => {
 			const id = match.replace(/<@!?/, "").replace(/>/, "");
-			const member = selcetedMessage.mentions.users.get(id);
+			const member = selectedMessage.mentions.users.get(id);
 			return `**${member.username.trim()}**`;
 		});
 
-		if (interaction.replied || interaction.deferred) {
-			d("follow up -- already replied");
-			interaction.followUp(content);
-		} else {
-			d("reply");
-			interaction.reply(content);
-		}
+		util.sendReply(interaction, content);
 	},
 };
 

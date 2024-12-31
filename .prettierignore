@@ -2,3 +2,4 @@ dist
 .yarn
 .pnp.*
 .vscode
+package-lock.json

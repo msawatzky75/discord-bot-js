@@ -1,6 +1,7 @@
 import debug from "debug";
 import {ChatInputCommandInteraction, SlashCommandBuilder} from "discord.js";
 import type {Command} from "./index";
+import util from "../util.js";
 
 const d = debug("bot.commands.roll");
 
@@ -9,7 +10,7 @@ const command: Command = {
 		.addNumberOption((b) =>
 			b
 				.setName("dice")
-				.setMinValue(0)
+				.setMinValue(1)
 				.setMaxValue(100)
 				.setRequired(false)
 				.setDescription("Number of dice to roll"),
@@ -34,7 +35,7 @@ const command: Command = {
 			allOutcomes.push(Math.floor(Math.random() * outcomes) + 1);
 		}
 
-		await interaction.reply(`Rolling ${dice}d${outcomes}: ` + allOutcomes.join(", "));
+		await util.sendReply(interaction, `Rolling ${dice}d${outcomes}: ` + allOutcomes.join(", "));
 	},
 };
 
