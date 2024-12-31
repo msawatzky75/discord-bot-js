@@ -1,6 +1,6 @@
 {
 	"name": "discord-bot-js",
-	"version": "2.5.1",
+	"version": "2.6.0",
 	"private": true,
 	"repository": "git@github.com:msawatzky75/discord-bot-js.git",
 	"author": "Matthew Sawatzky <msawatzky75@gmail.com>",

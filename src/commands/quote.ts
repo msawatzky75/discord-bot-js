@@ -42,33 +42,34 @@ const command: Command = {
 
 		if (!serverMessages) {
 			d(`No cache for ${quoteChannel.guild.name}, fetching quotes...`);
-			await util.sendReply(interaction, {
-				content: "Fetching quotes. This may take some time...",
-				ephemeral: true,
-			});
+			await interaction.deferReply();
 			await updateMessages(quoteChannel);
 			serverMessages = messages.get(quoteChannel.guildId);
 		} else if (timeSinceUpdate >= cacheLife) {
 			d(`Cache expired for ${quoteChannel.guild.name}, fetching quotes...`);
-			await util.sendReply(interaction, {
-				content: "Cache expired, refreshing. This may take some time...",
-				ephemeral: true,
-			});
+			await interaction.deferReply();
 			await updateMessages(quoteChannel);
 			serverMessages = messages.get(quoteChannel.guildId);
 		}
 
 		let selcetedMessage: Message;
 		if (search && serverMessages) {
-			await util.sendReply(interaction, {content: "Searching...", ephemeral: true});
+			if (!interaction.deferred) {
+				await interaction.deferReply();
+			}
 			const fuse = new Fuse(
 				serverMessages.map((m) => m),
 				fuseOptions,
 			);
 			const results = fuse.search(search, {limit: 1});
 			if (results.length) selcetedMessage = getRandom(results).item;
-			else await util.sendReply(interaction, {content: "Failed to find a match.", ephemeral: true});
+			else {
+				d("Failed to find match for quote search");
+				await interaction.followUp({content: "Failed to find a match."});
+				return;
+			}
 		}
+
 		if (!selcetedMessage) {
 			selcetedMessage = messages.get(quoteChannel.guildId).random();
 		}
@@ -80,9 +81,11 @@ const command: Command = {
 			return `**${member.username.trim()}**`;
 		});
 
-		if (interaction.replied) {
+		if (interaction.replied || interaction.deferred) {
+			d("follow up -- already replied");
 			interaction.followUp(content);
 		} else {
+			d("reply");
 			interaction.reply(content);
 		}
 	},
