@@ -34,11 +34,7 @@ client.on("ready", () => {
 					body: commands.map((c) => c.data.toJSON()),
 				})
 				.then((data: {name: string}[]) => {
-					d(
-						`Successfully registered '${data.map((d) => d.name).join(", ")}' to '${guild.name}' (${
-							guild.id
-						})`,
-					);
+					d(`Successfully registered '${data.map((d) => d.name).join(", ")}' to '${guild.name}' (${guild.id})`);
 				}, d);
 		});
 	}
