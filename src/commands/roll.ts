@@ -8,12 +8,7 @@ const d = debug("bot.commands.roll");
 const command: Command = {
 	data: new SlashCommandBuilder()
 		.addNumberOption((b) =>
-			b
-				.setName("dice")
-				.setMinValue(1)
-				.setMaxValue(100)
-				.setRequired(false)
-				.setDescription("Number of dice to roll"),
+			b.setName("dice").setMinValue(1).setMaxValue(100).setRequired(false).setDescription("Number of dice to roll"),
 		)
 		.addNumberOption((b) =>
 			b

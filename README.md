@@ -5,12 +5,6 @@
 
 ## Setup
 
-Requirements: [Yarn](https://yarnpkg.com/lang/en/docs/install/), Node (v16)
-OR [Docker](https://docs.docker.com/get-docker/), [Docker Compose](https://docs.docker.com/compose/install/)
-
-This project uses [zero-install yarn](https://yarnpkg.com/features/zero-installs), meaning you do
-not have to run a separate install step. All the dependancies are already there.
-
 1. Clone this repository.
 
 1. Create your environment by copying the [.env.default](.env.default) file to `.env`
@@ -20,22 +14,22 @@ not have to run a separate install step. All the dependancies are already there.
    $ cp .env.default .env
    ```
 
-1. Add ide helpers to your workspace:
+1. Install package dependencies:
 
    ```
-   $ yarn dlx @yarnpkg/sdks vscode
+   $ npm install
    ```
 
-1. Build the bot using this command:
+1. Build the bot using:
 
    ```
-   $ yarn build
+   $ npm run build
    ```
 
-1. You're done! You can run the bot with
+1. You're done! You can now run the bot:
 
    ```
-   $ yarn start
+   $ npm run start
    ```
 
 ### Using Docker
@@ -43,10 +37,10 @@ not have to run a separate install step. All the dependancies are already there.
 If you choose to use docker to run the bot, you can use the following commands:
 
 ```
-$ docker-compose up --build
+$ docker compose up --build
 ```
 
-or if you dont want to use docker-compose:
+or if you dont want to use docker compose:
 
 ```
 $ docker build . --tag marty-bot:latest
@@ -60,13 +54,13 @@ There are some commands to help you develop the bot:
 1. To rebuild the bot every time you save a file:
 
    ```
-   $ yarn watch
+   $ npm run watch
    ```
 
 1. To start the development server, and restart it every time you save a file:
 
    ```
-   $ yarn dev
+   $ npm run dev
    ```
 
 ## First Time Setup
@@ -74,8 +68,3 @@ There are some commands to help you develop the bot:
 In order for the slash commands to work, they need to be registered before
 the bot can process them. This is done automatically when the `AUTO_REGISTER` environment
 variable is set to `true`.
-
-## FAQ
-
-If you're having trouble with vscode not showing types correctly, switch the typescript
-version to the one located in the `.yarn/sdks/typescript/lib` folder
