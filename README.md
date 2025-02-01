@@ -1,7 +1,7 @@
 # Marty Bot
 
-[![Marty Latest](https://github.com/msawatzky75/discord-bot-js/actions/workflows/latest.yml/badge.svg?branch=master)](https://github.com/msawatzky75/discord-bot-js/actions/workflows/latest.yml)
-[![Marty Nightly](https://github.com/msawatzky75/discord-bot-js/actions/workflows/nightly.yml/badge.svg?branch=dev)](https://github.com/msawatzky75/discord-bot-js/actions/workflows/nightly.yml)
+[![Marty Latest](https://github.com/msawatzky75/discord-bot-js/actions/workflows/latest.yml/badge.svg)](https://github.com/msawatzky75/discord-bot-js/actions/workflows/latest.yml)
+[![Marty Nightly](https://github.com/msawatzky75/discord-bot-js/actions/workflows/nightly.yml/badge.svg)](https://github.com/msawatzky75/discord-bot-js/actions/workflows/nightly.yml)
 
 ## Setup
 
