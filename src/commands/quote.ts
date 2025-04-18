@@ -11,11 +11,9 @@ import type {Command} from "./index";
 import Fuse from "fuse.js";
 import type {IFuseOptions} from "fuse.js";
 import util from "../util.js";
+import {getMessages} from "../helpers/messages.js";
 
 const d = debug("bot.commands.quote");
-const messages = new Collection<Snowflake, Collection<string, Message<true>>>();
-const lastUpdate = new Collection<Snowflake, Date>();
-const cacheLife = 1000 * 60 * 15; // 15 minutes
 
 const fuseOptions: IFuseOptions<Message<true>> = {
 	keys: [{name: "content", weight: 1}],
@@ -36,32 +34,15 @@ const command: Command = {
 
 		if (!(quoteChannel instanceof TextChannel)) throw new Error("Could not find quote channel");
 
-		let serverMessages = messages.get(quoteChannel.guildId);
-		const timeSinceUpdate = new Date().getTime() - (lastUpdate.get(quoteChannel.guildId)?.getTime() ?? 0);
 		const search = interaction.options.getString("search");
+		const serverMessages = await getMessages(quoteChannel);
 
-		if (!serverMessages) {
-			d(`No cache for ${quoteChannel.guild.name}, fetching quotes...`);
-			await updateMessages(quoteChannel);
-			serverMessages = messages.get(quoteChannel.guildId);
-		} else if (timeSinceUpdate >= cacheLife) {
-			d(`Cache expired for ${quoteChannel.guild.name}, fetching quotes...`);
-			await updateMessages(quoteChannel);
-			serverMessages = messages.get(quoteChannel.guildId);
-		}
-
-		let selectedMessage: Message;
+		let selectedMessage: Message | null;
 		if (search && serverMessages) {
 			if (!interaction.deferred) {
 				await interaction.deferReply();
-			}
-			const fuse = new Fuse(
-				serverMessages.map((m) => m),
-				fuseOptions,
-			);
-			const results = fuse.search(search, {limit: 1});
-			if (results.length) selectedMessage = getRandom(results).item;
-			else {
+				selectedMessage = searchQuotes(search, serverMessages);
+			} else {
 				d("Failed to find match for quote search");
 				await util.sendReply(interaction, "Failed to find a match.");
 				return;
@@ -69,38 +50,33 @@ const command: Command = {
 		}
 
 		if (!selectedMessage) {
-			selectedMessage = messages.get(quoteChannel.guildId).random();
+			selectedMessage = serverMessages.random();
 		}
 
 		// replace mentions with their names
-		const content = selectedMessage.content.replace(/<@!?(\d+)>/g, (match) => {
-			const id = match.replace(/<@!?/, "").replace(/>/, "");
-			const member = selectedMessage.mentions.users.get(id);
-			return `**${member.username.trim()}**`;
-		});
+		const content = formatQuote(selectedMessage);
 
 		util.sendReply(interaction, content);
 	},
 };
 
-async function updateMessages(quoteChannel: TextChannel) {
-	const limit = 100;
+function searchQuotes(search: string, messages: Collection<string, Message>) {
+	const fuse = new Fuse(
+		messages.map((m) => m),
+		fuseOptions,
+	);
+	const results = fuse.search(search, {limit: 1});
+	if (results.length) return getRandom(results).item;
 
-	let quoteMessages: Collection<string, Message<true>> = new Collection();
-	let fetchedMessageCount = 0;
-	let pages = 0;
+	return null;
+}
 
-	do {
-		d(`fetching ${limit} new messages...`);
-		const newMessages = await quoteChannel.messages.fetch({limit: limit, before: quoteMessages.last()?.id});
-		fetchedMessageCount = newMessages.size;
-		quoteMessages = quoteMessages.concat(newMessages);
-		pages++;
-	} while (fetchedMessageCount === limit);
-
-	d(`fetched ${quoteMessages.size} messages over ${pages} pages`);
-	messages.set(quoteChannel.guildId, quoteMessages);
-	lastUpdate.set(quoteChannel.guildId, new Date());
+function formatQuote(message: Message) {
+	return message.content.replace(/<@!?(\d+)>/g, (match) => {
+		const id = match.replace(/<@!?/, "").replace(/>/, "");
+		const member = message.mentions.users.get(id);
+		return `**${member.username.trim()}**`;
+	});
 }
 
 function getRandom<T>(items: T[]) {

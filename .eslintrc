@@ -3,7 +3,7 @@
 	"extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
 	"env": {
 		"es6": true,
-		"node": true
+		"node": true,
 	},
 	"rules": {
 		"max-lines": ["warn", {"max": 300, "skipBlankLines": true, "skipComments": true}],
@@ -18,11 +18,11 @@
 		"no-unused-vars": "off",
 
 		// Typescript
-		"@typescript-eslint/no-unused-vars": ["warn", {"varsIgnorePattern": "d"}],
+		"@typescript-eslint/no-unused-vars": ["warn", {"varsIgnorePattern": "d|_"}],
 		"@typescript-eslint/explicit-member-accessibility": ["off"],
 		"@typescript-eslint/explicit-function-return-type": [
 			"off",
-			{"allowExpressions": true, "allowTypedFunctionExpressions": true}
-		]
-	}
+			{"allowExpressions": true, "allowTypedFunctionExpressions": true},
+		],
+	},
 }
