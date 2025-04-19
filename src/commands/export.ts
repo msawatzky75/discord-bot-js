@@ -108,6 +108,8 @@ const command: Command = {
 		const timeframe = moment.duration(interaction.options.getString("timeframe") ?? "P30D");
 		const timegroup = moment.duration(interaction.options.getString("timegroup") ?? "P1D");
 		const top = interaction.options.getNumber("top");
+		d(`Executing 'export' with type '${type}'`);
+
 		const messages = await getMessages(quoteChannel);
 
 		const startTime = moment().subtract(timeframe.clone());
@@ -123,16 +125,34 @@ const command: Command = {
 					quoted: getQuoted(x),
 				};
 			});
+		d("Successfully formatted data");
 
 		// await util.sendReply(interaction, `Type: ${type}\n`);
 		switch (type) {
 			case ExportTypes.csv:
-				await util.sendReply(interaction, `\`\`\`${toCsv(formattedData)}\`\`\``);
+				d("Exporting CSV");
+				await util.sendReply(interaction, {
+					files: [
+						{
+							attachment: Buffer.from(toCsv(formattedData), "utf-8"),
+							name: "export.csv",
+						},
+					],
+				});
 				break;
 			case ExportTypes.json:
-				await util.sendReply(interaction, `\`\`\`${toJson(formattedData)}\`\`\``);
+				d("Exporting JSON");
+				await util.sendReply(interaction, {
+					files: [
+						{
+							attachment: Buffer.from(toJson(formattedData), "utf-8"),
+							name: "export.json",
+						},
+					],
+				});
 				break;
 			case ExportTypes.chart:
+				d("Exporting chart");
 				await util.sendReply(interaction, {
 					files: [
 						{
