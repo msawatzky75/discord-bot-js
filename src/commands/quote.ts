@@ -21,8 +21,8 @@ const fuseOptions: IFuseOptions<Message<true>> = {
 
 const command: Command = {
 	data: new SlashCommandBuilder()
-		.addStringOption((b) => b.setName("search").setRequired(false).setDescription("Fuzzy search all quotes"))
 		.setName("quote")
+		.addStringOption((b) => b.setName("search").setRequired(false).setDescription("Fuzzy search all quotes"))
 		.setDescription("Sends a random quote from the quote wall."),
 
 	async execute(interaction: ChatInputCommandInteraction): Promise<void> {

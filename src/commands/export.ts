@@ -38,6 +38,29 @@ const ExportTypes = {
 	chart: "chart",
 };
 
+const colors = [
+	"hsl(0, 48.10%, 52.40%)",
+	"hsl(60, 48.10%, 52.40%)",
+	"hsl(120, 48.10%, 52.40%)",
+	"hsl(180, 48.10%, 52.40%)",
+	"hsl(240, 48.10%, 52.40%)",
+	"hsl(300, 48.10%, 52.40%)",
+
+	"hsl(20, 48.10%, 52.40%)",
+	"hsl(80, 48.10%, 52.40%)",
+	"hsl(140, 48.10%, 52.40%)",
+	"hsl(200, 48.10%, 52.40%)",
+	"hsl(260, 48.10%, 52.40%)",
+	"hsl(320, 48.10%, 52.40%)",
+
+	"hsl(40, 48.10%, 52.40%)",
+	"hsl(100, 48.10%, 52.40%)",
+	"hsl(160, 48.10%, 52.40%)",
+	"hsl(220, 48.10%, 52.40%)",
+	"hsl(280, 48.10%, 52.40%)",
+	"hsl(340, 48.10%, 52.40%)",
+];
+
 type QuoteData = {
 	message: string;
 	quoteDate: moment.Moment;
@@ -61,15 +84,16 @@ const command: Command = {
 		.addStringOption((b) =>
 			b
 				.setName("timeframe")
-				.setRequired(false)
-				.setDescription("Timeframe of quotes to visualize. Default: P30D (ISO8601 Time Interval)"),
+				.setDescription("Timeframe of quotes to visualize. Default: P30D (ISO8601 Time Interval)")
+				.setRequired(false),
 		)
 		.addStringOption((b) =>
 			b
 				.setName("timegroup")
-				.setRequired(false)
-				.setDescription("Segments of time to view on x axis. Default: P1D (ISO8601 Time Interval)"),
+				.setDescription("Segments of time to view on x axis. Default: P1D (ISO8601 Time Interval)")
+				.setRequired(false),
 		)
+		.addNumberOption((b) => b.setName("top").setDescription("Reduces result to the top N quoted").setRequired(false))
 		.setName("export")
 		.setDescription("Export data from the quotes channel"),
 
@@ -83,9 +107,10 @@ const command: Command = {
 		const type = interaction.options.getString("type");
 		const timeframe = moment.duration(interaction.options.getString("timeframe") ?? "P30D");
 		const timegroup = moment.duration(interaction.options.getString("timegroup") ?? "P1D");
+		const top = interaction.options.getNumber("top");
 		const messages = await getMessages(quoteChannel);
 
-		const startTime = moment().subtract(timeframe);
+		const startTime = moment().subtract(timeframe.clone());
 		moment.relativeTimeRounding(Math.floor);
 
 		const formattedData: QuoteData[] = messages
@@ -93,13 +118,13 @@ const command: Command = {
 			.map((x) => {
 				return {
 					message: getQuote(x),
-					quoteDate: roundDate(x.createdAt, timegroup, Math.floor),
+					quoteDate: util.roundDate(x.createdAt, timegroup, Math.floor),
 					quoter: x.author.username.trim(),
 					quoted: getQuoted(x),
 				};
 			});
 
-		await util.sendReply(interaction, `Type: ${type}\n`);
+		// await util.sendReply(interaction, `Type: ${type}\n`);
 		switch (type) {
 			case ExportTypes.csv:
 				await util.sendReply(interaction, `\`\`\`${toCsv(formattedData)}\`\`\``);
@@ -108,9 +133,14 @@ const command: Command = {
 				await util.sendReply(interaction, `\`\`\`${toJson(formattedData)}\`\`\``);
 				break;
 			case ExportTypes.chart:
-				// TODO: figure out data grouping
-				// TODO: figure out data filtering
-				await util.sendReply(interaction, {files: [{attachment: await createChart(formattedData), name: "chart.png"}]});
+				await util.sendReply(interaction, {
+					files: [
+						{
+							attachment: await createChart(formattedData, startTime.clone(), timeframe.clone(), top),
+							name: "chart.png",
+						},
+					],
+				});
 				break;
 		}
 	},
@@ -169,57 +199,6 @@ function commaEscape(line: string) {
 	return line;
 }
 
-function roundDate(date: Date, duration: moment.Duration, roundMethod: (x: number) => number = Math.round) {
-	const outputDate = moment(date);
-	const years = Math.trunc(duration.asYears());
-	const months = Math.trunc(duration.asMonths());
-	const days = Math.trunc(duration.asDays());
-	const hours = Math.trunc(duration.asHours());
-
-	if (years > 0) {
-		d(`Rounding years. (${duration.humanize()})`);
-		const i = years;
-		const val = outputDate
-			.year(roundMethod(outputDate.year() / i) * i)
-			.month(0)
-			.date(1)
-			.hour(0)
-			.minute(0)
-			.second(0);
-		d(`o: ${moment(date).format("yyyy-MM-DD")}, r: ${val.format("yyyy-MM-DD")}`);
-		return val;
-	}
-	if (months > 0) {
-		d(`Rounding months. (${duration.humanize()})`);
-		const i = months;
-		return outputDate
-			.month(roundMethod(outputDate.month() / i) * i)
-			.date(1)
-			.hour(0)
-			.minute(0)
-			.second(0);
-	}
-	if (days > 0) {
-		d(`Rounding days. (${duration.humanize()})`);
-		const i = days;
-		return outputDate
-			.date(roundMethod(outputDate.day() / i) * i)
-			.hour(0)
-			.minute(0)
-			.second(0);
-	}
-	if (hours > 0) {
-		d(`Rounding hours. (${duration.humanize()})`);
-		const i = hours;
-		return outputDate
-			.hour(roundMethod(outputDate.hour() / i) * i)
-			.minute(0)
-			.second(0);
-	}
-	d(`did not round date. (${duration.humanize()})`);
-	return outputDate;
-}
-
 function createChartData(data: QuoteData[]) {
 	type ChartDataPoint = string;
 	const distinctQuoted = Array.from(new Set(data.map((x) => x.quoted)));
@@ -232,16 +211,14 @@ function createChartData(data: QuoteData[]) {
 	return outputData.map(([user, datapoints]) => {
 		const sourceData = data.filter((y) => y.quoted === user);
 		datapoints = sourceData.reduce((prev, curr) => {
-			prev.push(
-				curr.quoteDate.format("yyyy-MM-DD"), //.toLocaleDateString(undefined, {year: "numeric", month: "numeric", day: "numeric"}),
-			);
+			prev.push(curr.quoteDate.format("yyyy-MM-DD"));
 			return prev;
 		}, [] as ChartDataPoint[]);
 		return [user, datapoints] as [string, ChartDataPoint[]];
 	});
 }
 
-function createChart(data: QuoteData[]) {
+function createChart(data: QuoteData[], startTime: moment.Moment, duration: moment.Duration, top: number = 5) {
 	const chartData: [string, [string, number][]][] = createChartData(data)
 		.map(
 			([label, data]) =>
@@ -253,45 +230,12 @@ function createChart(data: QuoteData[]) {
 						.map((x, i) => [x, i]),
 				] as [string, [string, number][]],
 		)
-		.sort((a, b) => a[1][0][0].localeCompare(b[1][0][0]));
+		.sort((a, b) => a[1][0][0].localeCompare(b[1][0][0]))
+		.slice(0, top);
 
-	const minimum: string = chartData.reduce(
-		(prev, curr) => (prev.localeCompare(curr[1][0][0]) > 0 ? curr[1][0][0] : prev),
-		"9999-99-99",
-	);
-
-	const maximum: string = chartData.reduce(
-		(prev, curr) => (prev.localeCompare(curr[1][0][0]) < 0 ? curr[1][0][0] : prev),
-		"0000-00-00",
-	);
-
-	d(`Min: ${minimum}`);
-	d(`Max: ${maximum}`);
-	d(JSON.stringify(chartData, null, "\t"));
-	const colors = [
-		"hsl(0, 48.10%, 52.40%)",
-		"hsl(60, 48.10%, 52.40%)",
-		"hsl(120, 48.10%, 52.40%)",
-		"hsl(180, 48.10%, 52.40%)",
-		"hsl(240, 48.10%, 52.40%)",
-		"hsl(300, 48.10%, 52.40%)",
-
-		"hsl(20, 48.10%, 52.40%)",
-		"hsl(80, 48.10%, 52.40%)",
-		"hsl(140, 48.10%, 52.40%)",
-		"hsl(200, 48.10%, 52.40%)",
-		"hsl(260, 48.10%, 52.40%)",
-		"hsl(320, 48.10%, 52.40%)",
-
-		"hsl(40, 48.10%, 52.40%)",
-		"hsl(100, 48.10%, 52.40%)",
-		"hsl(160, 48.10%, 52.40%)",
-		"hsl(220, 48.10%, 52.40%)",
-		"hsl(280, 48.10%, 52.40%)",
-		"hsl(340, 48.10%, 52.40%)",
-	];
-
+	const endtime = startTime.clone().add(duration);
 	const canvas = new Canvas(800, 400);
+	const labels = util.daysBetween(startTime, endtime).map((x) => moment(x).format("yyyy-MM-DD"));
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	new Chart(canvas as any, {
 		data: {
@@ -299,7 +243,7 @@ function createChart(data: QuoteData[]) {
 				...chartData.map(([label, data], i) => ({
 					type: "line" as const,
 					label,
-					data: data,
+					data,
 					pointBorderColor: colors[i],
 					borderColor: colors[i],
 					yAxisID: "y",
@@ -307,14 +251,7 @@ function createChart(data: QuoteData[]) {
 				})),
 			],
 
-			labels: util.daysBetween(new Date(minimum), new Date(maximum)).map((x) =>
-				x.toLocaleDateString(undefined, {
-					year: "numeric",
-					month: "numeric",
-					day: "numeric",
-				}),
-			),
-			// labels: util.getDaysOfMonth(new Date()),
+			labels,
 		},
 		options: {
 			scales: {
