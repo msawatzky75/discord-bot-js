@@ -156,7 +156,7 @@ const command: Command = {
 				await util.sendReply(interaction, {
 					files: [
 						{
-							attachment: await createChart(formattedData, startTime.clone(), timeframe.clone(), top),
+							attachment: await createChart(formattedData, startTime.clone(), top),
 							name: "chart.png",
 						},
 					],
@@ -240,8 +240,8 @@ function createChartData(data: QuoteData[]) {
 	});
 }
 
-function createChart(data: QuoteData[], startTime: moment.Moment, duration: moment.Duration, top: number) {
-	dv(`creating chart with config: ${toJson({data, startTime, duration, top})}`);
+function createChart(data: QuoteData[], startTime: moment.Moment, top: number) {
+	dv(`creating chart with config: ${toJson({data, startTime, top})}`);
 
 	const chartData: [string, [string, number][]][] = createChartData(data)
 		.map(
@@ -254,7 +254,7 @@ function createChart(data: QuoteData[], startTime: moment.Moment, duration: mome
 						.map((x, i) => [x, i]),
 				] as [string, [string, number][]],
 		)
-		.sort((a, b) => a[1][0][0].localeCompare(b[1][0][0]))
+		.sort((a, b) => b[1].length - a[1].length)
 		.slice(0, top);
 	chartData.forEach((x) => dv(`${x[0]}: ${toJson(x[1])}`));
 
@@ -282,7 +282,8 @@ function createChart(data: QuoteData[], startTime: moment.Moment, duration: mome
 				...chartData.map(([label, data], i) => ({
 					type: "line" as const,
 					label,
-					data,
+					// Add null points to bring the chart lines all the way to the right.
+					data: [...data, [maximum.format("yyyy-MM-DD"), data[data.length - 1][1]]],
 					pointBorderColor: colors[i],
 					borderColor: colors[i],
 					yAxisID: "y",
@@ -300,7 +301,7 @@ function createChart(data: QuoteData[], startTime: moment.Moment, duration: mome
 			plugins: {
 				title: {
 					display: true,
-					text: "Quote frequency per person",
+					text: `Quote frequency per person since ${startTime.format("yyyy-MM-DD")}`,
 				},
 			},
 		},
