@@ -204,7 +204,7 @@ function toCsv(data: QuoteData[]) {
 	return csvData
 		.map((items) => {
 			return items.reduce((prev, curr) => {
-				const item = curr instanceof Date ? curr.toISOString() : curr;
+				const item = curr instanceof moment ? curr.toISOString() : curr;
 
 				return `${prev},${item}`;
 			});
