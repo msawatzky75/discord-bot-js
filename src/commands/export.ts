@@ -4,7 +4,7 @@ import type {Command} from "./index";
 import util from "../util.js";
 import {getMessages} from "../helpers/messages.js";
 import {Canvas} from "skia-canvas";
-import moment, {max} from "moment";
+import moment from "moment";
 import {
 	Chart,
 	LineController,
@@ -19,6 +19,7 @@ import {
 } from "chart.js";
 
 const d = debug("bot.commands.export");
+const dv = debug("verbose.bot.commands.export");
 
 Chart.register([
 	LineController,
@@ -87,12 +88,6 @@ const command: Command = {
 				.setDescription("Timeframe of quotes to visualize. Default: P30D (ISO8601 Time Interval)")
 				.setRequired(false),
 		)
-		.addStringOption((b) =>
-			b
-				.setName("timegroup")
-				.setDescription("Segments of time to view on x axis. Default: P1D (ISO8601 Time Interval)")
-				.setRequired(false),
-		)
 		.addNumberOption((b) => b.setName("top").setDescription("Reduces result to the top N quoted").setRequired(false))
 		.setName("export")
 		.setDescription("Export data from the quotes channel"),
@@ -106,9 +101,14 @@ const command: Command = {
 
 		const type = interaction.options.getString("type");
 		const timeframe = moment.duration(interaction.options.getString("timeframe") ?? "P30D");
-		const timegroup = moment.duration(interaction.options.getString("timegroup") ?? "P1D");
-		const top = interaction.options.getNumber("top");
-		d(`Executing 'export' with type '${type}'`);
+		const top = interaction.options.getNumber("top") ?? 5;
+		d(
+			`Executing 'export' with config '${toJson({
+				type,
+				timeframe,
+				top,
+			})}'`,
+		);
 
 		const messages = await getMessages(quoteChannel);
 
@@ -120,7 +120,7 @@ const command: Command = {
 			.map((x) => {
 				return {
 					message: getQuote(x),
-					quoteDate: util.roundDate(x.createdAt, timegroup, Math.floor),
+					quoteDate: moment(x.createdAt).startOf("day"),
 					quoter: x.author.username.trim(),
 					quoted: getQuoted(x),
 				};
@@ -156,7 +156,7 @@ const command: Command = {
 				await util.sendReply(interaction, {
 					files: [
 						{
-							attachment: await createChart(formattedData, startTime.clone(), timeframe.clone(), top),
+							attachment: await createChart(formattedData, startTime.clone(), top),
 							name: "chart.png",
 						},
 					],
@@ -191,7 +191,7 @@ function getQuoted(message: Message) {
 	});
 }
 
-function toJson(data: QuoteData[]) {
+function toJson(data: object) {
 	return JSON.stringify(data, null, "\t");
 }
 
@@ -204,7 +204,7 @@ function toCsv(data: QuoteData[]) {
 	return csvData
 		.map((items) => {
 			return items.reduce((prev, curr) => {
-				const item = curr instanceof Date ? curr.toISOString() : curr;
+				const item = curr instanceof moment ? curr.toISOString() : curr;
 
 				return `${prev},${item}`;
 			});
@@ -223,6 +223,8 @@ function createChartData(data: QuoteData[]) {
 	type ChartDataPoint = string;
 	const distinctQuoted = Array.from(new Set(data.map((x) => x.quoted)));
 
+	dv(`distinct quoted: ${toJson(distinctQuoted)}`);
+
 	const outputData = distinctQuoted.reduce(
 		(prev, curr) => [...prev, [curr, []] as [string, ChartDataPoint[]]],
 		[] as [string, ChartDataPoint[]][],
@@ -238,7 +240,9 @@ function createChartData(data: QuoteData[]) {
 	});
 }
 
-function createChart(data: QuoteData[], startTime: moment.Moment, duration: moment.Duration, top: number = 5) {
+function createChart(data: QuoteData[], startTime: moment.Moment, top: number) {
+	dv(`creating chart with config: ${toJson({data, startTime, top})}`);
+
 	const chartData: [string, [string, number][]][] = createChartData(data)
 		.map(
 			([label, data]) =>
@@ -250,12 +254,27 @@ function createChart(data: QuoteData[], startTime: moment.Moment, duration: mome
 						.map((x, i) => [x, i]),
 				] as [string, [string, number][]],
 		)
-		.sort((a, b) => a[1][0][0].localeCompare(b[1][0][0]))
+		.sort((a, b) => b[1].length - a[1].length)
 		.slice(0, top);
+	chartData.forEach((x) => dv(`${x[0]}: ${toJson(x[1])}`));
 
-	const endtime = startTime.clone().add(duration);
 	const canvas = new Canvas(800, 400);
-	const labels = util.daysBetween(startTime, endtime).map((x) => moment(x).format("yyyy-MM-DD"));
+
+	const minimum: moment.Moment = chartData.reduce(
+		(prev, curr) => (prev.unix() > moment(curr[1][0][0]).unix() ? moment(curr[1][0][0]) : prev),
+		// just something really big that won't show up in the data
+		moment("3000-01-01"),
+	);
+	const maximum: moment.Moment = chartData.reduce(
+		(prev, curr) =>
+			prev.unix() < moment(curr[1][curr[1].length - 1][0]).unix() ? moment(curr[1][curr[1].length - 1][0]) : prev,
+		// just something really small that won't show up in the data
+		moment("1000-01-01"),
+	);
+	dv(`times: ${toJson({minimum, maximum})}`);
+
+	const labels = util.daysBetween(minimum, maximum).map((x) => x.format("yyyy-MM-DD"));
+
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	new Chart(canvas as any, {
 		data: {
@@ -263,7 +282,8 @@ function createChart(data: QuoteData[], startTime: moment.Moment, duration: mome
 				...chartData.map(([label, data], i) => ({
 					type: "line" as const,
 					label,
-					data,
+					// Add null points to bring the chart lines all the way to the right.
+					data: [...data, [maximum.format("yyyy-MM-DD"), data[data.length - 1][1]]],
 					pointBorderColor: colors[i],
 					borderColor: colors[i],
 					yAxisID: "y",
@@ -281,7 +301,7 @@ function createChart(data: QuoteData[], startTime: moment.Moment, duration: mome
 			plugins: {
 				title: {
 					display: true,
-					text: "Quote frequency per person",
+					text: `Quote frequency per person since ${startTime.format("yyyy-MM-DD")}`,
 				},
 			},
 		},
