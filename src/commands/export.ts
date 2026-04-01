@@ -39,6 +39,11 @@ const ExportTypes = {
 	chart: "chart",
 };
 
+const DataTypes = {
+	Quoted: "quoted",
+	Quoter: "quoter",
+};
+
 const colors = [
 	"hsl(0, 48.10%, 52.40%)",
 	"hsl(60, 48.10%, 52.40%)",
@@ -73,14 +78,24 @@ const command: Command = {
 	data: new SlashCommandBuilder()
 		.addStringOption((b) =>
 			b
-				.setName("type")
+				.setName("export_type")
 				.setChoices([
 					{name: ExportTypes.csv, value: ExportTypes.csv},
 					{name: ExportTypes.json, value: ExportTypes.json},
 					{name: ExportTypes.chart, value: ExportTypes.chart},
 				])
 				.setRequired(true)
-				.setDescription("export data type"),
+				.setDescription("export type"),
+		)
+		.addStringOption((b) =>
+			b
+				.setName("data_type")
+				.setChoices([
+					{name: DataTypes.Quoted, value: DataTypes.Quoted},
+					{name: DataTypes.Quoter, value: DataTypes.Quoter},
+				])
+				.setRequired(false)
+				.setDescription("Group exported data by quoter, or by quoted"),
 		)
 		.addStringOption((b) =>
 			b
@@ -99,7 +114,8 @@ const command: Command = {
 		});
 		if (!(quoteChannel instanceof TextChannel)) throw new Error("Could not find quote channel");
 
-		const type = interaction.options.getString("type");
+		const type = interaction.options.getString("export_type");
+		const dataType = interaction.options.getString("data_type") ?? DataTypes.Quoted;
 		const timeframe = moment.duration(interaction.options.getString("timeframe") ?? "P30D");
 		const top = interaction.options.getNumber("top") ?? 5;
 		d(
@@ -156,7 +172,7 @@ const command: Command = {
 				await util.sendReply(interaction, {
 					files: [
 						{
-							attachment: await createChart(formattedData, startTime.clone(), top),
+							attachment: await createChart(formattedData, startTime.clone(), top, dataType),
 							name: "chart.png",
 						},
 					],
@@ -219,9 +235,9 @@ function commaEscape(line: string) {
 	return line;
 }
 
-function createChartData(data: QuoteData[]) {
+function createChartData(data: QuoteData[], dataType: string) {
 	type ChartDataPoint = string;
-	const distinctQuoted = Array.from(new Set(data.map((x) => x.quoted)));
+	const distinctQuoted = Array.from(new Set(data.map((x) => (dataType == DataTypes.Quoted ? x.quoted : x.quoter))));
 
 	dv(`distinct quoted: ${toJson(distinctQuoted)}`);
 
@@ -231,7 +247,7 @@ function createChartData(data: QuoteData[]) {
 	);
 
 	return outputData.map(([user, datapoints]) => {
-		const sourceData = data.filter((y) => y.quoted === user);
+		const sourceData = data.filter((y) => (dataType == DataTypes.Quoted ? y.quoted : y.quoter) === user);
 		datapoints = sourceData.reduce((prev, curr) => {
 			prev.push(curr.quoteDate.format("yyyy-MM-DD"));
 			return prev;
@@ -240,10 +256,10 @@ function createChartData(data: QuoteData[]) {
 	});
 }
 
-function createChart(data: QuoteData[], startTime: moment.Moment, top: number) {
+function createChart(data: QuoteData[], startTime: moment.Moment, top: number, dataType: string) {
 	dv(`creating chart with config: ${toJson({data, startTime, top})}`);
 
-	const chartData: [string, [string, number][]][] = createChartData(data)
+	const chartData: [string, [string, number][]][] = createChartData(data, dataType)
 		.map(
 			([label, data]) =>
 				[
@@ -301,7 +317,10 @@ function createChart(data: QuoteData[], startTime: moment.Moment, top: number) {
 			plugins: {
 				title: {
 					display: true,
-					text: `Quote frequency per person since ${startTime.format("yyyy-MM-DD")}`,
+					text:
+						dataType == DataTypes.Quoted
+							? `Quoted frequency per person since ${startTime.format("yyyy-MM-DD")}`
+							: `Quoting frequency per person since ${startTime.format("yyyy-MM-DD")}`,
 				},
 			},
 		},
