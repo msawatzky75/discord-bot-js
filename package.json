@@ -35,6 +35,5 @@
 		"nodemon": "^3.1.9",
 		"prettier": "^3.4.2",
 		"rimraf": "^6.0.1"
-	},
-	"packageManager": "yarn@4.0.2"
+	}
 }
