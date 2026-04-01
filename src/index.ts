@@ -19,7 +19,7 @@ const client = new Client({
 	partials: [Partials.Message],
 });
 
-client.on("ready", () => {
+client.on("clientReady", () => {
 	d(`Logged in as ${client.user.tag}!`);
 	client.user.setActivity("v" + Config.Version);
 	client.user.setStatus("online");
